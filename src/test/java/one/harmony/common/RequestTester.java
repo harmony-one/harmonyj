@@ -15,8 +15,6 @@ import okhttp3.RequestBody;
 import okio.Buffer;
 
 public abstract class RequestTester {
-	public static final String HMY_LOCAL = "http://localhost:9500/";
-
 	private OkHttpClient httpClient;
 	private HttpService httpService;
 
@@ -26,7 +24,7 @@ public abstract class RequestTester {
 	public void setUp() {
 		requestInterceptor = new RequestInterceptor();
 		httpClient = new OkHttpClient.Builder().addInterceptor(requestInterceptor).build();
-		httpService = new HttpService(HMY_LOCAL, httpClient);
+		httpService = new HttpService(Config.DEFAULT_URL, httpClient);
 		initWeb3Client(httpService);
 	}
 

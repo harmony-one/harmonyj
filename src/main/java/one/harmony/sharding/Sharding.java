@@ -2,6 +2,7 @@ package one.harmony.sharding;
 
 import java.util.List;
 
+import one.harmony.common.Config;
 import one.harmony.rpc.RPC;
 import one.harmony.rpc.ShardingStructure;
 import one.harmony.rpc.ShardingStructure.RPCRoutes;
@@ -15,7 +16,7 @@ import one.harmony.rpc.ShardingStructure.RPCRoutes;
 public class Sharding {
 
 	public static List<RPCRoutes> getShardingStructure() throws Exception {
-		RPC rpc = new RPC(RPC.DEFAULT_URL);
+		RPC rpc = new RPC(Config.node);
 
 		ShardingStructure structure = rpc.getShardingStructure().send();
 		if (structure.hasError()) {

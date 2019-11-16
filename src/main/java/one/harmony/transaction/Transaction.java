@@ -6,8 +6,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.ECDSASignature;
 import org.web3j.crypto.ECKeyPair;
@@ -24,13 +22,13 @@ import org.web3j.utils.Numeric;
 import one.harmony.rpc.RPC;
 
 /**
+ * Transaction class provides methods for Harmony transaction creation,
+ * encoding, and signing.
  * 
  * @author gupadhyaya
  *
  */
 public class Transaction {
-	private static final Logger logger = LoggerFactory.getLogger(Transaction.class);
-
 	private BigInteger nonce;
 	private BigInteger gasPrice;
 	private BigInteger gasLimit;

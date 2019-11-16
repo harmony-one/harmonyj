@@ -147,11 +147,11 @@ public class Store {
 		String osName = osName1.toLowerCase();
 
 		if (osName.startsWith("win")) {
-			return String.format("%s%s%s%s%s", System.getenv("APPDATA"), File.separator, Config.DEFAULT_DIR_NAME,
-					File.separator, Config.DEFAULT_ACCOUNT_ALIAS_DIR_NAME);
+			return String.format("%s%s%s%s%s", System.getenv("APPDATA"), File.separator, Config.keystore,
+					File.separator, Config.accounts);
 		} else {
-			return String.format("%s%s%s%s%s", System.getProperty("user.home"), File.separator, Config.DEFAULT_DIR_NAME,
-					File.separator, Config.DEFAULT_ACCOUNT_ALIAS_DIR_NAME);
+			return String.format("%s%s%s%s%s", System.getProperty("user.home"), File.separator, Config.keystore,
+					File.separator, Config.accounts);
 		}
 	}
 

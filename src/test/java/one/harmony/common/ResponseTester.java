@@ -15,8 +15,6 @@ import okhttp3.Protocol;
 import okhttp3.ResponseBody;
 
 public class ResponseTester {
-	public static final String HMY_LOCAL = "http://localhost:9500/";
-
 	private HttpService web3jService;
 	private OkHttpClient okHttpClient;
 	private ResponseInterceptor responseInterceptor;
@@ -33,7 +31,7 @@ public class ResponseTester {
 	}
 
 	protected void configureWeb3Service(boolean includeRawResponses) {
-		web3jService = new HttpService(HMY_LOCAL, okHttpClient, includeRawResponses);
+		web3jService = new HttpService(Config.DEFAULT_URL, okHttpClient, includeRawResponses);
 	}
 
 	protected <T extends Response> T deserialiseResponse(Class<T> type) {

@@ -6,13 +6,13 @@ import java.util.Collections;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.http.HttpService;
 
-public class RPC {
+import one.harmony.common.Config;
 
-	public static final String DEFAULT_URL = "http://localhost:9500/";
+public class RPC {
 	private final HttpService service;
 
 	public RPC() {
-		this.service = new HttpService(DEFAULT_URL);
+		this.service = new HttpService(Config.node);
 	}
 
 	public RPC(HttpService service) {

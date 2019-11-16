@@ -98,7 +98,7 @@ public class Keys {
 		log.info(
 				"**Important** write this seed phrase in a safe place, it is the only way to recover your account if you ever forget your password");
 		log.info(mnemonic);
-		return addKey(accountName, Config.DEFAULT_PASSPHRASE, mnemonic);
+		return addKey(accountName, Config.passphrase, mnemonic);
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class Keys {
 	 */
 	public static String importKeyStore(String keyFilePath, String accountName)
 			throws CipherException, IllegalArgumentException, IOException {
-		return importKeyStore(keyFilePath, accountName, Config.DEFAULT_PASSPHRASE);
+		return importKeyStore(keyFilePath, accountName, Config.passphrase);
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class Keys {
 	 */
 	public static String importPrivateKey(String secp256k1PRV, String accountName)
 			throws CipherException, IllegalArgumentException, IOException {
-		return importPrivateKey(secp256k1PRV, accountName, Config.DEFAULT_PASSPHRASE);
+		return importPrivateKey(secp256k1PRV, accountName, Config.passphrase);
 	}
 
 	/**
@@ -217,7 +217,7 @@ public class Keys {
 	 */
 	public static String exportPrivateKeyFromAddress(String oneAddress)
 			throws JsonParseException, JsonMappingException, CipherException, IOException {
-		return exportPrivateKeyFromAddress(oneAddress, Config.DEFAULT_PASSPHRASE);
+		return exportPrivateKeyFromAddress(oneAddress, Config.passphrase);
 	}
 
 	/**
@@ -250,7 +250,7 @@ public class Keys {
 	 */
 	public static String exportPrivateKeyFromAccountName(String accountName)
 			throws JsonParseException, JsonMappingException, CipherException, IOException {
-		return exportPrivateKeyFromAccountName(accountName, Config.DEFAULT_PASSPHRASE);
+		return exportPrivateKeyFromAccountName(accountName, Config.passphrase);
 	}
 
 	/**
@@ -285,7 +285,7 @@ public class Keys {
 	 */
 	public static String exportKeyStoreFromAddress(String oneAddress)
 			throws JsonParseException, JsonMappingException, IOException, CipherException {
-		return exportKeyStoreFromAddress(oneAddress, Config.DEFAULT_PASSPHRASE);
+		return exportKeyStoreFromAddress(oneAddress, Config.passphrase);
 	}
 
 	/**
@@ -319,7 +319,7 @@ public class Keys {
 	 */
 	public static String exportKeyStoreFromAccountName(String accountName)
 			throws JsonParseException, JsonMappingException, IOException, CipherException {
-		return exportKeyStoreFromAccountName(accountName, Config.DEFAULT_PASSPHRASE);
+		return exportKeyStoreFromAccountName(accountName, Config.passphrase);
 	}
 
 	/**
