@@ -122,9 +122,10 @@ public class Transfer {
 	 * @param passphrase    to unlock sender's keystore
 	 * @param dryRun        does not send signed transaction
 	 * @param waitToConfirm only waits if non-zero value, in seconds
+	 * @return transaction hash
 	 * @throws Exception
 	 */
-	public void execute(int chainID, String passphrase, boolean dryRun, int waitToConfirmTime) throws Exception {
+	public String execute(int chainID, String passphrase, boolean dryRun, int waitToConfirmTime) throws Exception {
 		List<RPCRoutes> shards = Sharding.getShardingStructure();
 		if (!Sharding.validateShardIDs(this.fromShard, this.toShard, shards.size())) {
 			throw new IllegalArgumentException("Invalid shard ids passed");
@@ -139,7 +140,7 @@ public class Transfer {
 		Account account = new Account(accountName, address, credentials, walletFile);
 
 		String payload = "";
-		new Handler(account, url).execute(chainID, this.to, payload, this.amount, this.gasPrice, this.fromShard,
+		return new Handler(account, url).execute(chainID, this.to, payload, this.amount, this.gasPrice, this.fromShard,
 				this.toShard, dryRun, waitToConfirmTime);
 
 	}

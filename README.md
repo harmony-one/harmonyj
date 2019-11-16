@@ -111,7 +111,7 @@ The sample output is:
 
 ### Transfer
 
-The transfer class provides functionality to transfer funds between any two Harmony accounts. The key api's are `Transfer` constructor and `execute` method.
+The transfer class provides functionality to transfer funds between any two Harmony accounts. The key api's are `Transfer` constructor and `execute` method. The `execute` method returns the transaction hash of the transfer. To check that transfer is committed to the blockchain, increase the `waitToConfirmTime` in seconds. 
 An example is shown below:
 
 ```
@@ -126,7 +126,7 @@ public void testTransfer() throws Exception {
 	boolean dryRun = false;
 	int waitToConfirmTime = 0;
 	String passphrase = "harmony-one";
-	new Transfer(from, to, amount, fromShard, toShard).execute(LOCAL_NET, passphrase, dryRun, waitToConfirmTime);
+	String txHash = new Transfer(from, to, amount, fromShard, toShard).execute(LOCAL_NET, passphrase, dryRun, waitToConfirmTime);
 }
 ```
 

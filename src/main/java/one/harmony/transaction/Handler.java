@@ -184,7 +184,7 @@ public class Handler {
 		}
 	}
 
-	public void execute(int chainId, String receiver, String payload, double amount, long gasPrice, int fromShard,
+	public String execute(int chainId, String receiver, String payload, double amount, long gasPrice, int fromShard,
 			int toShard, boolean dryRun, int waitToConfirmTime) throws Exception {
 		setShardIDs(fromShard, toShard);
 		setIntrinsicGas(payload);
@@ -199,5 +199,6 @@ public class Handler {
 			sendSignedTx();
 			txConfirm(waitToConfirmTime);
 		}
+		return this.transaction.getTxHash();
 	}
 }
