@@ -46,6 +46,9 @@ public class Store {
 		File keysDir = new File(getDefaultKeyDirectory());
 		if (!keysDir.exists()) {
 			keysDir.mkdirs();
+			keysDir.setExecutable(true);
+			keysDir.setReadable(true);
+			keysDir.setWritable(true);
 		}
 	}
 
@@ -98,9 +101,11 @@ public class Store {
 		String keysDirName = getDefaultKeyDirectory();
 		File keysDir = new File(keysDirName);
 
-		for (File file : keysDir.listFiles()) {
-			if (file.isDirectory()) {
-				accounts.put(file.getName(), file.listFiles()[0].getName());
+		if (keysDir != null && keysDir.listFiles() != null) {
+			for (File file : keysDir.listFiles()) {
+				if (file.isDirectory()) {
+					accounts.put(file.getName(), file.listFiles()[0].getName());
+				}
 			}
 		}
 		return accounts;
@@ -210,6 +215,26 @@ public class Store {
 
 	public static void clean() throws IOException {
 		File keysDir = new File(getDefaultKeyDirectory());
-		FileUtils.deleteDirectory(keysDir);
+		if (keysDir != null && keysDir.listFiles() != null) {
+			for (File file : keysDir.listFiles()) {
+				if (file.isDirectory()) {
+					FileUtils.deleteDirectory(file);
+				}
+			}
+		}
+	}
+
+	public static void clean(String accountName) throws IOException {
+		File keysDir = new File(getDefaultKeyDirectory());
+		if (keysDir != null && keysDir.listFiles() != null) {
+			for (File file : keysDir.listFiles()) {
+				if (file.isDirectory()) {
+					if (file.getName().equals(accountName)) {
+						FileUtils.deleteDirectory(file);
+						return;
+					}
+				}
+			}
+		}
 	}
 }
