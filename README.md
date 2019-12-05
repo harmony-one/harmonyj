@@ -18,6 +18,16 @@ Dependencies
 
 To get started, it is best to have the latest JDK and Gradle installed.
 
+### Installation
+Add the following Maven dependency to your project's `pom.xml`:
+```
+<dependency>
+  <groupId>one.harmony</groupId>
+  <artifactId>harmonyj</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
 ### Building from the command line
 
 To perform a full build (including JavaDocs and unit/integration tests) use JDK 8+
