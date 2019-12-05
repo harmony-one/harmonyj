@@ -23,7 +23,7 @@ public class Transfer {
 
 	private final String from;
 	private final String to;
-	private final double amount;
+	private final String amount;
 	private final long gasPrice;
 	private final int fromShard;
 	private final int toShard;
@@ -38,7 +38,7 @@ public class Transfer {
 	public Transfer(String from, String to) {
 		this.from = from;
 		this.to = to;
-		this.amount = 0.0;
+		this.amount = "0";
 		this.gasPrice = 1;
 		this.fromShard = 0;
 		this.toShard = 0;
@@ -51,7 +51,7 @@ public class Transfer {
 	 * @param to
 	 * @param amount
 	 */
-	public Transfer(String from, String to, double amount) {
+	public Transfer(String from, String to, String amount) {
 		this.from = from;
 		this.to = to;
 		this.amount = amount;
@@ -68,7 +68,7 @@ public class Transfer {
 	 * @param amount
 	 * @param gasPrice
 	 */
-	public Transfer(String from, String to, double amount, long gasPrice) {
+	public Transfer(String from, String to, String amount, long gasPrice) {
 		this.from = from;
 		this.to = to;
 		this.amount = amount;
@@ -87,7 +87,7 @@ public class Transfer {
 	 * @param fromShard
 	 * @param toShard
 	 */
-	public Transfer(String from, String to, double amount, int fromShard, int toShard) {
+	public Transfer(String from, String to, String amount, int fromShard, int toShard) {
 		this.from = from;
 		this.to = to;
 		this.amount = amount;
@@ -106,7 +106,7 @@ public class Transfer {
 	 * @param fromShard
 	 * @param toShard
 	 */
-	public Transfer(String from, String to, double amount, long gasPrice, int fromShard, int toShard) {
+	public Transfer(String from, String to, String amount, long gasPrice, int fromShard, int toShard) {
 		this.from = from;
 		this.to = to;
 		this.amount = amount;

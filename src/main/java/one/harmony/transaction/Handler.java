@@ -27,6 +27,9 @@ import one.harmony.sharding.Sharding;
  */
 public class Handler {
 	private static final Logger log = LoggerFactory.getLogger(Handler.class);
+	private static final BigInteger NANO = BigInteger.TEN.pow(9);
+	private static final BigInteger ONE = NANO.multiply(NANO);
+	private static final BigDecimal DECIMAL_ONE = new BigDecimal(ONE);
 
 	private Transaction transaction;
 	private TxParams txParams;
@@ -86,31 +89,25 @@ public class Handler {
 		txParams.setGas(gas);
 	}
 
-	private void setAmount(double amount) {
-		BigInteger nano = BigInteger.TEN.pow(9);
-		double nanoAmount = nano.doubleValue() * amount;
-		BigInteger amt = new BigDecimal(nanoAmount).toBigInteger().multiply(nano);
-		txParams.setTransferAmount(amt.doubleValue());
+	private void setAmount(String amount) {
+		txParams.setTransferAmount(amount);
 	}
 
-	private void verifyBalance(double amount) throws Exception {
+	private void verifyBalance(String amount) throws Exception {
 		HmyResponse response = new RPC(this.url).getBalance(this.sender.getAddress().getOneAddr()).send();
 		if (response.hasError()) {
 			throw new Exception(response.getError().getMessage());
 		}
 
-		BigInteger nano = BigInteger.TEN.pow(9);
-
 		BigInteger balance = Numeric.toBigInt(response.getResult());
-		// new BigInteger(Numeric.prependHexPrefix(), 16).divide(nano);
 
-		double nanoAmount = nano.doubleValue() * amount;
-		BigInteger transfer = new BigDecimal(nanoAmount).toBigInteger();
+		BigDecimal amt = new BigDecimal(amount).multiply(DECIMAL_ONE);
+		BigInteger transfer = amt.toBigInteger();
 
-		double bln = balance.divide(nano).doubleValue();
-		double tns = transfer.divide(nano).doubleValue();
+		double tns = transfer.divide(ONE).doubleValue();
+		double bln = balance.divide(ONE).doubleValue();
 
-		if (tns > bln) {
+		if (transfer.compareTo(balance) > 0) {
 			throw new Exception(
 					String.format("current balance of %lf is not enough for the requested transfer %lf", bln, tns));
 		}
@@ -138,11 +135,9 @@ public class Handler {
 		this.txParams.setNonce(nonce.longValue());
 	}
 
-	private void setNewTransactionWithDataAndGas(String payload, double amount, long gasPrice) {
-		BigInteger nano = BigInteger.TEN.pow(9);
-		double nanoAmount = nano.doubleValue() * amount;
-		BigInteger amt = new BigDecimal(nanoAmount).toBigInteger().multiply(nano);
-		BigInteger gas = BigInteger.valueOf(gasPrice).multiply(nano);
+	private void setNewTransactionWithDataAndGas(String payload, String amount, long gasPrice) {
+		BigInteger amt = new BigDecimal(amount).multiply(DECIMAL_ONE).toBigInteger();
+		BigInteger gas = BigInteger.valueOf(gasPrice).multiply(NANO);
 
 		this.transaction = new Transaction(txParams.getNonce(), txParams.getReceiver(), txParams.getFromShard(),
 				txParams.getToShard(), amt, txParams.getGas(), gas, payload.getBytes());
@@ -184,7 +179,7 @@ public class Handler {
 		}
 	}
 
-	public String execute(int chainId, String receiver, String payload, double amount, long gasPrice, int fromShard,
+	public String execute(int chainId, String receiver, String payload, String amount, long gasPrice, int fromShard,
 			int toShard, boolean dryRun, int waitToConfirmTime) throws Exception {
 		setShardIDs(fromShard, toShard);
 		setIntrinsicGas(payload);

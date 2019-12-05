@@ -17,7 +17,7 @@ public class TransferTest {
 		testImportPrivateKey();
 		String from = "one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy"; // Harmony localnet addresses
 		String to = "one1pf75h0t4am90z8uv3y0dgunfqp4lj8wr3t5rsp"; // Harmony localnet addresses
-		double amount = 40;
+		String amount = "50.714285714";
 		int fromShard = 0;
 		int toShard = 1;
 		boolean dryRun = false;

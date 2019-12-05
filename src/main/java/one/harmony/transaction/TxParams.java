@@ -6,7 +6,7 @@ public class TxParams {
 	private int fromShard;
 	private int toShard;
 	private long gas;
-	private double transferAmount;
+	private String transferAmount;
 	private String receiver;
 	private long gasPrice;
 
@@ -42,11 +42,11 @@ public class TxParams {
 		this.gas = gas;
 	}
 
-	public double getTransferAmount() {
+	public String getTransferAmount() {
 		return transferAmount;
 	}
 
-	public void setTransferAmount(double transferAmount) {
+	public void setTransferAmount(String transferAmount) {
 		this.transferAmount = transferAmount;
 	}
 
