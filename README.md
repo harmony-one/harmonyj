@@ -24,7 +24,7 @@ Add the following Maven dependency to your project's `pom.xml`:
 <dependency>
   <groupId>one.harmony</groupId>
   <artifactId>harmonyj</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 </dependency>
 ```
 

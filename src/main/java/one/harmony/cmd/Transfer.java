@@ -27,6 +27,7 @@ public class Transfer {
 	private final long gasPrice;
 	private final int fromShard;
 	private final int toShard;
+	private final String data;
 
 	/**
 	 * Transfers default amount (0.0) using two Harmony addresses between same
@@ -42,6 +43,7 @@ public class Transfer {
 		this.gasPrice = 1;
 		this.fromShard = 0;
 		this.toShard = 0;
+		this.data = "";
 	}
 
 	/**
@@ -58,6 +60,7 @@ public class Transfer {
 		this.gasPrice = 1;
 		this.fromShard = 0;
 		this.toShard = 0;
+		this.data = "";
 	}
 
 	/**
@@ -75,6 +78,7 @@ public class Transfer {
 		this.gasPrice = gasPrice;
 		this.fromShard = 0;
 		this.toShard = 0;
+		this.data = "";
 	}
 
 	/**
@@ -94,6 +98,28 @@ public class Transfer {
 		this.gasPrice = 1;
 		this.fromShard = fromShard;
 		this.toShard = toShard;
+		this.data = "";
+	}
+
+	/**
+	 * Transfer the specified amount between Harmony addresses using the specified
+	 * shards and payload
+	 * 
+	 * @param from
+	 * @param to
+	 * @param amount
+	 * @param fromShard
+	 * @param toShard
+	 * @param data
+	 */
+	public Transfer(String from, String to, String amount, int fromShard, int toShard, String data) {
+		this.from = from;
+		this.to = to;
+		this.amount = amount;
+		this.gasPrice = 1;
+		this.fromShard = fromShard;
+		this.toShard = toShard;
+		this.data = data;
 	}
 
 	/**
@@ -113,6 +139,27 @@ public class Transfer {
 		this.gasPrice = gasPrice;
 		this.fromShard = fromShard;
 		this.toShard = toShard;
+		this.data = "";
+	}
+
+	/**
+	 * 
+	 * @param from
+	 * @param to
+	 * @param amount
+	 * @param gasPrice
+	 * @param fromShard
+	 * @param toShard
+	 * @param data
+	 */
+	public Transfer(String from, String to, String amount, long gasPrice, int fromShard, int toShard, String data) {
+		this.from = from;
+		this.to = to;
+		this.amount = amount;
+		this.gasPrice = gasPrice;
+		this.fromShard = fromShard;
+		this.toShard = toShard;
+		this.data = data;
 	}
 
 	/**
@@ -139,9 +186,8 @@ public class Transfer {
 		Credentials credentials = Credentials.create(Wallet.decrypt(passphrase, walletFile));
 		Account account = new Account(accountName, address, credentials, walletFile);
 
-		String payload = "";
-		return new Handler(account, url).execute(chainID, this.to, payload, this.amount, this.gasPrice, this.fromShard,
-				this.toShard, dryRun, waitToConfirmTime);
+		return new Handler(account, url).execute(chainID, this.to, this.data, this.amount, this.gasPrice,
+				this.fromShard, this.toShard, dryRun, waitToConfirmTime);
 
 	}
 }

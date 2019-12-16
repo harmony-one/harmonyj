@@ -23,7 +23,9 @@ public class TransferTest {
 		boolean dryRun = false;
 		int waitToConfirmTime = 0;
 		String passphrase = "harmony-one";
-		new Transfer(from, to, amount, fromShard, toShard).execute(LOCAL_NET, passphrase, dryRun, waitToConfirmTime);
+		String memo = "0x5061796d656e7420666f722078797a";
+		new Transfer(from, to, amount, fromShard, toShard, memo).execute(LOCAL_NET, passphrase, dryRun,
+				waitToConfirmTime);
 		Keys.cleanKeyStore();
 	}
 
