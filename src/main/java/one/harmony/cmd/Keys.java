@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.ECKeyPair;
-import org.web3j.crypto.Hash;
 import org.web3j.crypto.MnemonicUtils;
 import org.web3j.crypto.Wallet;
 import org.web3j.crypto.WalletFile;
@@ -58,13 +57,13 @@ public class Keys {
 		if (!MnemonicUtils.validateMnemonic(mnemonic)) {
 			throw new IllegalArgumentException("Invalid mnemonic");
 		}
-		byte[] seed = MnemonicUtils.generateSeed(mnemonic, passphrase);
-
-		ECKeyPair ecKeyPair = ECKeyPair.create(Hash.sha256(seed));
-		Credentials credentials = Credentials.create(ecKeyPair);
+		// byte[] seed = MnemonicUtils.generateSeed(mnemonic, passphrase);
+		// ECKeyPair ecKeyPair = ECKeyPair.create(Hash.sha256(seed));
+		// Credentials.create(ecKeyPair);
+		Credentials credentials = Store.loadBip44Credentials(passphrase, mnemonic);
 		String address = credentials.getAddress();
 		String oneAddress = Address.toBech32(address);
-		Store.generateWalletFile(accountName, passphrase, ecKeyPair);
+		Store.generateWalletFile(accountName, passphrase, credentials.getEcKeyPair());
 		return oneAddress;
 	}
 
