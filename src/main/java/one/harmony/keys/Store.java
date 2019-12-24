@@ -11,8 +11,11 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.web3j.crypto.Bip32ECKeyPair;
 import org.web3j.crypto.CipherException;
+import org.web3j.crypto.Credentials;
 import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.MnemonicUtils;
 import org.web3j.crypto.Wallet;
 import org.web3j.crypto.WalletFile;
 
@@ -158,6 +161,15 @@ public class Store {
 			return String.format("%s%s%s%s%s", System.getProperty("user.home"), File.separator, Config.keystore,
 					File.separator, Config.accounts);
 		}
+	}
+
+	public static Credentials loadBip44Credentials(String password, String mnemonic) {
+		byte[] seed = MnemonicUtils.generateSeed(mnemonic, password);
+		Bip32ECKeyPair masterKeypair = Bip32ECKeyPair.generateKeyPair(seed);
+		final int[] path = { 44 | Bip32ECKeyPair.HARDENED_BIT, 1023 | Bip32ECKeyPair.HARDENED_BIT,
+				0 | Bip32ECKeyPair.HARDENED_BIT, 0 };
+		Bip32ECKeyPair bip44Keypair = Bip32ECKeyPair.deriveKeyPair(masterKeypair, path);
+		return Credentials.create(bip44Keypair);
 	}
 
 	public static void generateWalletFile(String accountName, String password, ECKeyPair ecKeyPair)
