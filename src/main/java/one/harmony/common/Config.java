@@ -61,6 +61,23 @@ public class Config {
 		return loadProperties().getProperty("passphrase");
 	}
 
+	/**
+	 * Set the config parameters using the supplied inputs, overwrites the
+	 * parameters read from hmy-config.properties
+	 * 
+	 * @param nodeUrl
+	 * @param keystoreDir
+	 * @param accountsDir
+	 * @param defaultPassPhrase
+	 */
+	public static void setConfigParameters(String nodeUrl, String keystoreDir, String accountsDir,
+			String defaultPassPhrase) {
+		node = nodeUrl;
+		keystore = keystoreDir;
+		accounts = accountsDir;
+		passphrase = defaultPassPhrase;
+	}
+
 	private static Properties loadProperties() throws IOException {
 		Properties properties = new Properties();
 		properties.load(Config.class.getResourceAsStream("/hmy-config.properties"));

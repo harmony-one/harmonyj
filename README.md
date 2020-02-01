@@ -24,7 +24,7 @@ Add the following Maven dependency to your project's `pom.xml`:
 <dependency>
   <groupId>one.harmony</groupId>
   <artifactId>harmonyj</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
 </dependency>
 ```
 
@@ -57,6 +57,22 @@ node=http://localhost:9500/
 keystore.dir=.hmy_java
 accounts.dir=accounts-keys
 passphrase=harmony-one
+```
+
+Another way to pass the configuration parameters is using the `Config.setConfigParameters` method.
+
+```
+import one.harmony.common.Config;
+
+public class Test {
+	public static void main(String[] args) throws Exception {
+		String nodeUrl = "http://localhost:9500";
+		String keystoreDir = ".hmy_java";
+		String accountsDir = "accounts-keys";
+		String defaultPassPhrase = "harmony-one";
+		Config.setConfigParameters(nodeUrl, keystoreDir, accountsDir, defaultPassPhrase);
+	}
+}
 ```
 
 ### Generating Javadoc
