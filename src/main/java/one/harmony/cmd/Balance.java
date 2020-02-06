@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.web3j.utils.Numeric;
 
+import one.harmony.common.Config;
 import one.harmony.rpc.HmyResponse;
 import one.harmony.rpc.RPC;
 import one.harmony.rpc.ShardingStructure.RPCRoutes;
@@ -47,6 +48,23 @@ public class Balance {
 		return sb.toString();
 	}
 
+	/**
+	 * Checks account balance using local Harmony instance
+	 * 
+	 * @param oneAddress
+	 * @return
+	 * @throws Exception
+	 */
+	public static String checkLocal(String oneAddress) throws Exception {
+		RPC node = new RPC(Config.node);
+		HmyResponse response = node.getBalance(oneAddress).send();
+		if (response.hasError()) {
+			throw new Exception("failed to fetch the balance for address: " + oneAddress);
+		}
+		BigInteger bln = Numeric.toBigInt(response.getResult());
+		return covertBalanceToReadableFormat(bln);
+	}
+
 	private static String covertBalanceToReadableFormat(BigInteger balance) {
 		BigDecimal decimalBln = new BigDecimal(balance);
 		BigDecimal nano = new BigDecimal(BigInteger.TEN.pow(9));
@@ -58,6 +76,6 @@ public class Balance {
 
 	public static void main(String[] args) throws Exception {
 		String oneAddress = "one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy"; // One of the harmony accounts in the localnet
-		System.out.println(check(oneAddress));
+		System.out.println(checkLocal(oneAddress));
 	}
 }

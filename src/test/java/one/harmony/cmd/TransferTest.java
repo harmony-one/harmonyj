@@ -24,7 +24,8 @@ public class TransferTest {
 		int waitToConfirmTime = 0;
 		String passphrase = "harmony-one";
 		String memo = "0x5061796d656e7420666f722078797a";
-		new Transfer(from, to, amount, fromShard, toShard, memo).execute(LOCAL_NET, passphrase, dryRun,
+		String url = "http://127.0.0.1:9500/";
+		new Transfer(from, to, amount, fromShard, toShard, memo).executeLocal(url, LOCAL_NET, passphrase, dryRun,
 				waitToConfirmTime);
 		Keys.cleanKeyStore();
 	}

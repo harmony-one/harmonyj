@@ -190,4 +190,34 @@ public class Transfer {
 				this.fromShard, this.toShard, dryRun, waitToConfirmTime);
 
 	}
+
+	/**
+	 * Method to execute the transfer using the local Harmony instance
+	 * 
+	 * @param url
+	 * @param chainID
+	 * @param passphrase
+	 * @param dryRun
+	 * @param waitToConfirmTime
+	 * @return
+	 * @throws Exception
+	 */
+	public String executeLocal(String url, int chainID, String passphrase, boolean dryRun, int waitToConfirmTime)
+			throws Exception {
+		List<RPCRoutes> shards = Sharding.getShardingStructure();
+		if (!Sharding.validateShardIDs(this.fromShard, this.toShard, shards.size())) {
+			throw new IllegalArgumentException("Invalid shard ids passed");
+		}
+
+		String accountName = Store.getAccountNameFromAddress(this.from);
+		boolean isHex = false;
+		Address address = new Address(this.from, isHex);
+		WalletFile walletFile = Store.extractWalletFileFromAddress(this.from);
+		Credentials credentials = Credentials.create(Wallet.decrypt(passphrase, walletFile));
+		Account account = new Account(accountName, address, credentials, walletFile);
+
+		return new Handler(account, url).execute(chainID, this.to, this.data, this.amount, this.gasPrice,
+				this.fromShard, this.toShard, dryRun, waitToConfirmTime);
+
+	}
 }

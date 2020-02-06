@@ -155,11 +155,11 @@ public class Store {
 		String osName = osName1.toLowerCase();
 
 		if (osName.startsWith("win")) {
-			return String.format("%s%s%s%s%s", System.getenv("APPDATA"), File.separator, Config.keystore,
-					File.separator, Config.accounts);
+			return String.format("%s%s%s", Config.keystore, File.separator, Config.accounts); // System.getenv("APPDATA"),
+																								// File.separator,
 		} else {
-			return String.format("%s%s%s%s%s", System.getProperty("user.home"), File.separator, Config.keystore,
-					File.separator, Config.accounts);
+			return String.format("%s%s%s", Config.keystore, File.separator, Config.accounts); // System.getProperty("user.home"),
+																								// File.separator,
 		}
 	}
 

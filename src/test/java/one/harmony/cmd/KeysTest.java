@@ -3,8 +3,6 @@ package one.harmony.cmd;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
-
 import org.junit.jupiter.api.Test;
 
 public class KeysTest {
@@ -17,8 +15,7 @@ public class KeysTest {
 
 	@Test
 	public void testGetDefaultKeysLocation() throws Exception {
-		assertEquals(Keys.getKeysLocation(),
-				String.format("%s%s%s", System.getProperty("user.home"), File.separator, ".hmy_java/accounts-keys"));
+		assertEquals(Keys.getKeysLocation(), String.format("%s", ".hmy_java/accounts-keys"));
 	}
 
 	@Test

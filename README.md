@@ -24,7 +24,7 @@ Add the following Maven dependency to your project's `pom.xml`:
 <dependency>
   <groupId>one.harmony</groupId>
   <artifactId>harmonyj</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
 </dependency>
 ```
 
@@ -46,15 +46,15 @@ gradle clean assemble
 
 HarmonyJ reads the below listed user specified properties from `{user.home}/hmy-config.properties` file.
 * `node` Harmony URL to connect to
-* `keystore.dir` The keystore directory name. This directory will be created user `user.home`
-* `accounts.dir` The accounts directory alias where the accounts and key files are stored. This directory will be under `user.home`
+* `keystore.dir` The keystore directory path. This should be absolute path.
+* `accounts.dir` The accounts directory alias where the accounts and key files are stored.
 * `passphrase` The default passphrase to use   
 
 An example hmy-config.properties file looks like:
 
 ```
 node=http://localhost:9500/
-keystore.dir=.hmy_java
+keystore.dir=/Users/john/kestore.local
 accounts.dir=accounts-keys
 passphrase=harmony-one
 ```
@@ -67,7 +67,7 @@ import one.harmony.common.Config;
 public class Test {
 	public static void main(String[] args) throws Exception {
 		String nodeUrl = "http://localhost:9500";
-		String keystoreDir = ".hmy_java";
+		String keystoreDir = "/Users/john/mystore";
 		String accountsDir = "accounts-keys";
 		String defaultPassPhrase = "harmony-one";
 		Config.setConfigParameters(nodeUrl, keystoreDir, accountsDir, defaultPassPhrase);
@@ -135,6 +135,19 @@ The sample output is:
 ]
 ```
 
+For checking the balance using your own Harmony node:
+
+```
+import one.harmony.cmd.Balance;
+
+public void queryBalance() throws Exception {
+	String oneAddress = "one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy";
+	Balance.checkLocal(oneAddress);
+}
+```
+The sample output is: `206.1904761904762`
+
+
 ### Transfer
 
 The transfer class provides functionality to transfer funds between any two Harmony accounts. The key api's are `Transfer` constructor and `execute` method. The `execute` method returns the transaction hash of the transfer. To check that transfer is committed to the blockchain, increase the `waitToConfirmTime` in seconds. 
@@ -159,6 +172,9 @@ public void testTransfer() throws Exception {
 
 For the transfer to work, the `from` address account key must exists in the local keystore. If not, add the key using the key management apis.
 The transfer automatically creates a transaction, encodes it, signs the transaction using `from` address's key, and sends it to the blockchain. 
+
+For performing transfers using Harmony node use `executeLocal(nodeUrl, LOCAL_NET, passphrase, dryRun, waitToConfirmTime)`.
+
 
 ### Keys
 
