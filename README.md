@@ -166,15 +166,21 @@ public void testTransfer() throws Exception {
 	int waitToConfirmTime = 0;
 	String passphrase = "harmony-one";
 	String memo = "0x5061796d656e7420666f722078797a";
-	String txHash = new Transfer(from, to, amount, fromShard, toShard, memo).execute(LOCAL_NET, passphrase, dryRun, waitToConfirmTime);
+	Transfer t = new Transfer(from, to, amount, fromShard, toShard, memo);
+	t.prepare(passphrase); // prepare transfer locally, before connecting to the network
+	String txHash = t.execute(LOCAL_NET, dryRun, waitToConfirmTime); // needs connection to the network
 }
 ```
 
 For the transfer to work, the `from` address account key must exists in the local keystore. If not, add the key using the key management apis.
 The transfer automatically creates a transaction, encodes it, signs the transaction using `from` address's key, and sends it to the blockchain. 
 
-For performing transfers using Harmony node use `executeLocal(nodeUrl, LOCAL_NET, passphrase, dryRun, waitToConfirmTime)`.
-
+For performing transfers using Harmony node use:
+```
+String nodeUrl ; "http://127.0.0.1:9500";
+t.prepare(passphrase, nodeUrl);
+String txHash = t.execute(LOCAL_NET, dryRun, waitToConfirmTime)
+```
 
 ### Keys
 

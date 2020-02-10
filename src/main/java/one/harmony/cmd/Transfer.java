@@ -29,6 +29,8 @@ public class Transfer {
 	private final int toShard;
 	private final String data;
 
+	private Handler handler;
+
 	/**
 	 * Transfers default amount (0.0) using two Harmony addresses between same
 	 * shards (shard 0)
@@ -163,50 +165,51 @@ public class Transfer {
 	}
 
 	/**
+	 * Method to prepare the transfer
+	 * 
+	 * @param passphrase
+	 * @throws Exception
+	 */
+	public void prepare(String passphrase) throws Exception {
+		prepareInternal(passphrase, null);
+	}
+
+	/**
+	 * Method to prepare the transfer using the local Harmony node
+	 * 
+	 * @param passphrase
+	 * @param nodeUrl
+	 * @throws Exception
+	 */
+	public void prepare(String passphrase, String nodeUrl) throws Exception {
+		prepareInternal(passphrase, nodeUrl);
+	}
+
+	/**
 	 * Method to execute the transfer.
 	 * 
 	 * @param chainID       represents which chain id to target
-	 * @param passphrase    to unlock sender's keystore
 	 * @param dryRun        does not send signed transaction
 	 * @param waitToConfirm only waits if non-zero value, in seconds
 	 * @return transaction hash
 	 * @throws Exception
 	 */
-	public String execute(int chainID, String passphrase, boolean dryRun, int waitToConfirmTime) throws Exception {
-		List<RPCRoutes> shards = Sharding.getShardingStructure();
-		if (!Sharding.validateShardIDs(this.fromShard, this.toShard, shards.size())) {
-			throw new IllegalArgumentException("Invalid shard ids passed");
-		}
-
-		String url = Sharding.getHandlerFor(shards, this.fromShard);
-		String accountName = Store.getAccountNameFromAddress(this.from);
-		boolean isHex = false;
-		Address address = new Address(this.from, isHex);
-		WalletFile walletFile = Store.extractWalletFileFromAddress(this.from);
-		Credentials credentials = Credentials.create(Wallet.decrypt(passphrase, walletFile));
-		Account account = new Account(accountName, address, credentials, walletFile);
-
-		return new Handler(account, url).execute(chainID, this.to, this.data, this.amount, this.gasPrice,
-				this.fromShard, this.toShard, dryRun, waitToConfirmTime);
-
+	public String execute(int chainID, boolean dryRun, int waitToConfirmTime) throws Exception {
+		return this.handler.execute(chainID, this.to, this.data, this.amount, this.gasPrice, this.fromShard,
+				this.toShard, dryRun, waitToConfirmTime);
 	}
 
-	/**
-	 * Method to execute the transfer using the local Harmony instance
-	 * 
-	 * @param url
-	 * @param chainID
-	 * @param passphrase
-	 * @param dryRun
-	 * @param waitToConfirmTime
-	 * @return
-	 * @throws Exception
-	 */
-	public String executeLocal(String url, int chainID, String passphrase, boolean dryRun, int waitToConfirmTime)
-			throws Exception {
+	private void prepareInternal(String passphrase, String nodeUrl) throws Exception {
 		List<RPCRoutes> shards = Sharding.getShardingStructure();
 		if (!Sharding.validateShardIDs(this.fromShard, this.toShard, shards.size())) {
 			throw new IllegalArgumentException("Invalid shard ids passed");
+		}
+
+		String url;
+		if (nodeUrl != null) {
+			url = nodeUrl;
+		} else {
+			url = Sharding.getHandlerFor(shards, this.fromShard);
 		}
 
 		String accountName = Store.getAccountNameFromAddress(this.from);
@@ -216,8 +219,6 @@ public class Transfer {
 		Credentials credentials = Credentials.create(Wallet.decrypt(passphrase, walletFile));
 		Account account = new Account(accountName, address, credentials, walletFile);
 
-		return new Handler(account, url).execute(chainID, this.to, this.data, this.amount, this.gasPrice,
-				this.fromShard, this.toShard, dryRun, waitToConfirmTime);
-
+		this.handler = new Handler(account, url);
 	}
 }

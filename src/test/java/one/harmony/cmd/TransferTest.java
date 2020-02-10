@@ -15,18 +15,45 @@ public class TransferTest {
 	public void testTransfer() throws Exception {
 		Keys.cleanKeyStore();
 		testImportPrivateKey();
+
 		String from = "one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy"; // Harmony localnet addresses
 		String to = "one1pf75h0t4am90z8uv3y0dgunfqp4lj8wr3t5rsp"; // Harmony localnet addresses
-		String amount = "50.714285714";
+		String amount = "1.002";
 		int fromShard = 0;
 		int toShard = 1;
+		String memo = "0x5061796d656e7420666f722078797a";
+		// Create transfer object
+		Transfer t = new Transfer(from, to, amount, fromShard, toShard, memo);
+		// Prepare transfer
+		String passphrase = "harmony-one";
+		t.prepare(passphrase); // offline, no need to connect to network
+		// Execute transfer
 		boolean dryRun = false;
 		int waitToConfirmTime = 0;
-		String passphrase = "harmony-one";
+		String txHash = t.execute(LOCAL_NET, dryRun, waitToConfirmTime); // needs connection to network
+		Keys.cleanKeyStore();
+	}
+
+	@Test
+	public void testLocalTransfer() throws Exception {
+		Keys.cleanKeyStore();
+		testImportPrivateKey();
+		String from = "one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy"; // Harmony localnet addresses
+		String to = "one1pf75h0t4am90z8uv3y0dgunfqp4lj8wr3t5rsp"; // Harmony localnet addresses
+		String amount = "1.002";
+		int fromShard = 0;
+		int toShard = 1;
 		String memo = "0x5061796d656e7420666f722078797a";
+		// Create transfer object
+		Transfer t = new Transfer(from, to, amount, fromShard, toShard, memo);
+		// Prepare transfer
+		String passphrase = "harmony-one";
 		String url = "http://127.0.0.1:9500/";
-		new Transfer(from, to, amount, fromShard, toShard, memo).executeLocal(url, LOCAL_NET, passphrase, dryRun,
-				waitToConfirmTime);
+		t.prepare(passphrase, url); // offline, no need to connect to network
+		// Execute transfer
+		boolean dryRun = false;
+		int waitToConfirmTime = 0;
+		String txHash = t.execute(LOCAL_NET, dryRun, waitToConfirmTime); // needs connection to network
 		Keys.cleanKeyStore();
 	}
 
