@@ -49,6 +49,7 @@ HarmonyJ reads the below listed user specified properties from `{user.home}/hmy-
 * `keystore.dir` The keystore directory path. This should be absolute path.
 * `accounts.dir` The accounts directory alias where the accounts and key files are stored.
 * `passphrase` The default passphrase to use   
+* `mnemonics.file.path` The path to mnemonics file that stores the generated mnemonics
 
 An example hmy-config.properties file looks like:
 
@@ -57,6 +58,7 @@ node=http://localhost:9500/
 keystore.dir=/Users/john/kestore.local
 accounts.dir=accounts-keys
 passphrase=harmony-one
+mnemonics.file.path=/Users/john/kestore.local/mnemonics.txt
 ```
 
 Another way to pass the configuration parameters is using the `Config.setConfigParameters` method.
@@ -73,6 +75,13 @@ public class Test {
 		Config.setConfigParameters(nodeUrl, keystoreDir, accountsDir, defaultPassPhrase);
 	}
 }
+```
+
+If the user wants to specify an absolute file path to store the generated mnemonics:
+```
+		...
+		String mnemonicsFilePath = keystoreDir + "/mnemonics.txt";
+		Config.setConfigParameters(nodeUrl, keystoreDir, accountsDir, defaultPassPhrase, mnemonicsFilePath);
 ```
 
 ### Generating Javadoc

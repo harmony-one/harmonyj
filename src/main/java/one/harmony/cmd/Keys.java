@@ -1,5 +1,7 @@
 package one.harmony.cmd;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -39,6 +41,15 @@ public class Keys {
 		return MnemonicUtils.generateMnemonic(initialEntropy);
 	}
 
+	private static void writeMnemonics(String address, String mnemonic) throws IOException {
+		BufferedWriter bw = new BufferedWriter(new FileWriter(Config.mnemonicsFile, true));
+		bw.write(address);
+		bw.write(":");
+		bw.write(mnemonic);
+		bw.newLine();
+		bw.close();
+	}
+
 	/**
 	 * addKey method creates a new key in the local keystore, but requires
 	 * mnemonics. If the accountName already exists or the supplied mnemonics is
@@ -64,6 +75,7 @@ public class Keys {
 		String address = credentials.getAddress();
 		String oneAddress = Address.toBech32(address);
 		Store.generateWalletFile(accountName, passphrase, credentials.getEcKeyPair());
+		writeMnemonics(oneAddress, mnemonic);
 		return oneAddress;
 	}
 
