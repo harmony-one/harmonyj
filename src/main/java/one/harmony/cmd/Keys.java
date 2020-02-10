@@ -81,6 +81,8 @@ public class Keys {
 		log.info(
 				"**Important** write this seed phrase in a safe place, it is the only way to recover your account if you ever forget your password",
 				mnemonic);
+		System.out.println("***** Generated Mnemonics ****");
+		System.out.println(mnemonic);
 		return addKey(accountName, passphrase, mnemonic);
 	}
 
@@ -97,6 +99,8 @@ public class Keys {
 		log.info(
 				"**Important** write this seed phrase in a safe place, it is the only way to recover your account if you ever forget your password");
 		log.info(mnemonic);
+		System.out.println("***** Generated Mnemonics ****");
+		System.out.println(mnemonic);
 		return addKey(accountName, Config.passphrase, mnemonic);
 	}
 

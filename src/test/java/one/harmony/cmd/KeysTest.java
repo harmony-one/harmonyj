@@ -29,6 +29,18 @@ public class KeysTest {
 	@Test
 	public void testAddKey() throws Exception {
 		Keys.cleanKeyStore();
+		Keys.addKey("a1");
+	}
+
+	@Test
+	public void testAddKeyPassphrase() throws Exception {
+		Keys.cleanKeyStore();
+		Keys.addKey("a1", "");
+	}
+
+	@Test
+	public void testAddKeyMnemonics() throws Exception {
+		Keys.cleanKeyStore();
 		String mnemonics = "fragile pilot provide copper use average thrive forum behave inmate level account grape primary board cradle phone popular hello shuffle fault session window skin";
 		Keys.addKey("a2", "harmony", mnemonics);
 	}

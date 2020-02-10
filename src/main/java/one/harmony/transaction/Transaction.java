@@ -171,7 +171,7 @@ public class Transaction {
 	}
 
 	private byte[] encode(long chainId) {
-		SignatureData signatureData = new SignatureData(longToBytes(chainId), new byte[] {}, new byte[] {});
+		SignatureData signatureData = new SignatureData((byte) chainId, new byte[] {}, new byte[] {});
 		return encode(signatureData);
 	}
 
@@ -194,7 +194,7 @@ public class Transaction {
 		result.add(RlpString.create(this.getPayload()));
 
 		if (signatureData != null) {
-			result.add(RlpString.create(Bytes.trimLeadingZeroes(signatureData.getV())));
+			result.add(RlpString.create(signatureData.getV()));
 			result.add(RlpString.create(Bytes.trimLeadingZeroes(signatureData.getR())));
 			result.add(RlpString.create(Bytes.trimLeadingZeroes(signatureData.getS())));
 		}
@@ -249,7 +249,7 @@ public class Transaction {
 		}
 
 		// 1 header + 32 bytes for R + 32 bytes for S
-		byte[] v = new byte[] { (byte) headerByte };
+		byte v = (byte) headerByte;
 		byte[] r = Numeric.toBytesPadded(sig.r, 32);
 		byte[] s = Numeric.toBytesPadded(sig.s, 32);
 
