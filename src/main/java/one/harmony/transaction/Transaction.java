@@ -246,6 +246,7 @@ public class Transaction {
 			headerByte = 0;
 			headerByte += 35;
 			headerByte += chainId * 2;
+			headerByte += recId;
 		}
 
 		// 1 header + 32 bytes for R + 32 bytes for S

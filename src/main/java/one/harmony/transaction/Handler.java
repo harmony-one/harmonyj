@@ -2,7 +2,6 @@ package one.harmony.transaction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Base64;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -74,17 +73,17 @@ public class Handler {
 			gas += nz * 68; // TxDataNonZeroGas = 68
 
 			long z = data.length - nz;
-			if ((Long.MAX_VALUE - gas) / 68 < z) {
+			if ((Long.MAX_VALUE - gas) / 4 < z) {
 				throw new Exception("out of gas");
 			}
-			gas += z * 68; // TxDataNonZeroGas = 68
+			gas += z * 4; // TxDataZeroGas = 4
 		}
 
 		return gas;
 	}
 
 	private void setIntrinsicGas(String payload) throws Exception {
-		byte[] data = Base64.getDecoder().decode(payload);
+		byte[] data = payload.getBytes(); // Base64.getDecoder().decode(payload);
 		long gas = computeIntrinsicGas(data, false, true);
 		txParams.setGas(gas);
 	}

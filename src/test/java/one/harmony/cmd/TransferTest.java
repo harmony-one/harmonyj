@@ -18,10 +18,10 @@ public class TransferTest {
 
 		String from = "one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy"; // Harmony localnet addresses
 		String to = "one1pf75h0t4am90z8uv3y0dgunfqp4lj8wr3t5rsp"; // Harmony localnet addresses
-		String amount = "1.002";
+		String amount = "1";
 		int fromShard = 0;
 		int toShard = 1;
-		String memo = "0x5061796d656e7420666f722078797a";
+		String memo = " ";// "0x5061796d656e7420666f722078797a";
 		// Create transfer object
 		Transfer t = new Transfer(from, to, amount, fromShard, toShard, memo);
 		// Prepare transfer
