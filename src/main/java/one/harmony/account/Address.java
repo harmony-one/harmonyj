@@ -2,12 +2,13 @@ package one.harmony.account;
 
 import java.io.ByteArrayOutputStream;
 
-import org.bitcoinj.core.AddressFormatException;
-import org.bitcoinj.core.Bech32;
-import org.bitcoinj.core.Bech32.Bech32Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.utils.Numeric;
+
+import one.harmony.common.AddressFormatException;
+import one.harmony.common.Bech32;
+import one.harmony.common.Bech32.Bech32Data;
 
 /**
  * Harmony address class that provides Harmony one address and hex address.
