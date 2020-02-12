@@ -192,6 +192,8 @@ public class Handler {
 		if (!dryRun) {
 			sendSignedTx();
 			txConfirm(waitToConfirmTime);
+		} else {
+			log.info(new String(this.transaction.getRawHash()));
 		}
 		return this.transaction.getTxHash();
 	}
