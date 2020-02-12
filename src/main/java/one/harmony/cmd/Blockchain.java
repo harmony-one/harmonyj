@@ -27,6 +27,37 @@ public class Blockchain {
 		return response.getResult();
 	}
 
+	/**
+	 * Send raw transaction to blockchain
+	 * 
+	 * @param rawTransaction
+	 * @return
+	 * @throws Exception
+	 */
+	public String sendRawTransaction(String rawTransaction) throws Exception {
+		HmyResponse response = new RPC(Config.node).sendRawTransaction(rawTransaction).send();
+		if (response.hasError()) {
+			throw new Exception(response.getError().getMessage());
+		}
+		return response.getResult();
+	}
+
+	/**
+	 * Send raw transaction to blockchain using the specified node url
+	 * 
+	 * @param nodeUrl
+	 * @param rawTransaction
+	 * @return
+	 * @throws Exception
+	 */
+	public String sendRawTransaction(String nodeUrl, String rawTransaction) throws Exception {
+		HmyResponse response = new RPC(nodeUrl).sendRawTransaction(rawTransaction).send();
+		if (response.hasError()) {
+			throw new Exception(response.getError().getMessage());
+		}
+		return response.getResult();
+	}
+
 	public static void main(String[] args) throws Exception {
 		System.out.println(getProtocolVersion());
 	}
