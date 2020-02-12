@@ -24,7 +24,7 @@ Add the following Maven dependency to your project's `pom.xml`:
 <dependency>
   <groupId>one.harmony</groupId>
   <artifactId>harmonyj</artifactId>
-  <version>1.0.9</version>
+  <version>1.0.11</version>
 </dependency>
 ```
 
@@ -112,6 +112,17 @@ import one.harmony.cmd.Blockchain;
 public void getProtocolVersion() {
 	String protocol = Blockchain.getProtocolVersion();
 }
+```
+Blockchain class can be used to send raw transactions.
+```
+import one.harmony.cmd.Blockchain;
+
+public static void main(String[] args) throws Exception {
+	String nodeUrl = "http://localhost:9500";
+	String rawTransaction = "0x...";
+	String txHash = Blockchain.sendRawTransaction(nodeUrl, rawTransaction);
+}
+
 ```
 
 ### Balance

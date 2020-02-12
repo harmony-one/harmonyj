@@ -34,7 +34,7 @@ public class Blockchain {
 	 * @return
 	 * @throws Exception
 	 */
-	public String sendRawTransaction(String rawTransaction) throws Exception {
+	public static String sendRawTransaction(String rawTransaction) throws Exception {
 		HmyResponse response = new RPC(Config.node).sendRawTransaction(rawTransaction).send();
 		if (response.hasError()) {
 			throw new Exception(response.getError().getMessage());
@@ -50,7 +50,7 @@ public class Blockchain {
 	 * @return
 	 * @throws Exception
 	 */
-	public String sendRawTransaction(String nodeUrl, String rawTransaction) throws Exception {
+	public static String sendRawTransaction(String nodeUrl, String rawTransaction) throws Exception {
 		HmyResponse response = new RPC(nodeUrl).sendRawTransaction(rawTransaction).send();
 		if (response.hasError()) {
 			throw new Exception(response.getError().getMessage());
@@ -60,6 +60,9 @@ public class Blockchain {
 
 	public static void main(String[] args) throws Exception {
 		System.out.println(getProtocolVersion());
+		String node = "http://localhost:9500";
+		String rawTransaction = "0x...";
+		System.out.println(sendRawTransaction(node, rawTransaction));
 	}
 
 }
