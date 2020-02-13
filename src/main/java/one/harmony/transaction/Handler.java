@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.web3j.crypto.CipherException;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.ECKeyPair;
 import org.web3j.utils.Numeric;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,6 +37,11 @@ public class Handler {
 	private TxParams txParams;
 	private Account sender;
 	private String url;
+
+	public Handler( String url) {
+		this.txParams = new TxParams();
+		this.url = url;
+	}
 
 	public Handler(Account account, String url) {
 		this.sender = account;
@@ -196,5 +204,49 @@ public class Handler {
 			log.info(new String(this.transaction.getRawHash()));
 		}
 		return this.transaction.getTxHash();
+	}
+
+
+	private void signAndPrepareTxEncodedForSendingWithPRV(int chainId, String secp256k1PRV)
+			throws CipherException,JsonProcessingException {
+		ECKeyPair ecKeyPair = ECKeyPair.create(new BigInteger(secp256k1PRV, 16));
+		Credentials credentials = Credentials.create(ecKeyPair);
+
+		Transaction signedTransaction = this.transaction.sign(chainId, credentials);
+		log.info(String.format("signed transaction with chainId %d", chainId));
+		ObjectMapper mapper = new ObjectMapper();
+		log.info(mapper.writeValueAsString(signedTransaction));
+	}
+
+
+	public long getAddressNonce(String oneAddress) throws  Exception{
+		Address address = new Address(oneAddress,false);
+		RPC rpc = new RPC(this.url);
+		HmyResponse response = rpc.getTransactionCount(address.getHexAddr()).send();
+		BigInteger nonce = Numeric.toBigInt(response.getResult());
+		return nonce.longValue();
+	}
+
+
+	public long getAddressNonce(String oneAddress, String nodeUrl) throws  Exception{
+		Address address = new Address(oneAddress,false);
+		RPC rpc = new RPC(nodeUrl);
+		HmyResponse response = rpc.getTransactionCount(address.getHexAddr()).send();
+		BigInteger nonce = Numeric.toBigInt(response.getResult());
+		return nonce.longValue();
+	}
+
+	public String setRawTransactionWithPRV(int chainId, String sender,String receiver, String payload, String amount,long nonce,
+										   long gasPrice, int fromShard, int toShard, String secp256k1PRV) throws Exception {
+		this.txParams.setFromShard(fromShard);
+		this.txParams.setToShard(toShard);
+		setIntrinsicGas(payload);
+		setAmount(amount);
+		setReceiver(receiver);
+		setGasPrice();
+		this.txParams.setNonce(nonce);
+		setNewTransactionWithDataAndGas(payload, amount, gasPrice);
+		signAndPrepareTxEncodedForSendingWithPRV(chainId, secp256k1PRV);
+		return new String(this.transaction.getRawHash());
 	}
 }

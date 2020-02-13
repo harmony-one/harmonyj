@@ -118,9 +118,31 @@ Blockchain class can be used to send raw transactions.
 import one.harmony.cmd.Blockchain;
 
 public static void main(String[] args) throws Exception {
-	String nodeUrl = "http://localhost:9500";
-	String rawTransaction = "0x...";
-	String txHash = Blockchain.sendRawTransaction(nodeUrl, rawTransaction);
+	
+    String key = "d1a3da98cf4f7e08a988c582424d8cfe71e57d772916728ecc69ef61f9ffefea";
+    //generate the address from private key
+    String from = Keys.genAddressFromPRV(key);
+
+    String nodeUrl = "https://api.s0.t.hmny.io";
+
+    String to = "one1lpllj3cuehzrlppvernr9vp5w7pyc8xhp29v53"; // Harmony localnet addresses
+    String amount = "0.1";
+    int fromShard = 0;
+    int toShard = 1;
+    String memo = "ta da moon ";
+    int gasPrice = 1;
+    int chainid = 1;
+    //get the latest nonce
+    long nonce = new Handler(nodeUrl).getAddressNonce(from,nodeUrl);
+    System.out.printf("%d\n",nonce);
+
+    //generate the rawTx off line
+    String rawTx = new Handler(nodeUrl).setRawTransactionWithPRV(chainid,from,to,memo,amount,
+            nonce,gasPrice,fromShard,toShard,key);
+
+
+    //send the rawTx to blockchain
+    String txHash = Blockchain.sendRawTransaction(nodeUrl, rawTx);
 }
 
 ```
