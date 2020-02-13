@@ -201,6 +201,24 @@ public class Keys {
 		return importPrivateKey(secp256k1PRV, accountName, Config.passphrase);
 	}
 
+
+	/**
+	 * generater the one address from the secp256k1 private key
+	 *
+	 * @param secp256k1PRV
+	 * @return
+	 * @throws CipherException
+	 */
+
+	public static String genAddressFromPRV(String secp256k1PRV) throws CipherException{
+		ECKeyPair ecKeyPair = ECKeyPair.create(new BigInteger(secp256k1PRV, 16));
+		Credentials credentials = Credentials.create(ecKeyPair);
+		String address = credentials.getAddress();
+		String oneAddress = Address.toBech32(address);
+		return oneAddress;
+	}
+
+
 	/**
 	 * Export the secp256k1 private key using the provided Harmony one address and
 	 * passphrase.
