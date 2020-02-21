@@ -24,7 +24,7 @@ Add the following Maven dependency to your project's `pom.xml`:
 <dependency>
   <groupId>one.harmony</groupId>
   <artifactId>harmonyj</artifactId>
-  <version>1.0.11</version>
+  <version>1.0.13</version>
 </dependency>
 ```
 
@@ -124,6 +124,57 @@ public static void main(String[] args) throws Exception {
 }
 
 ```
+
+The account transactions history can be queried as follows:
+
+```
+import one.harmony.cmd.Blockchain;
+
+public static void main(String[] args) throws Exception {
+	// By default Config.node is used, however, a node url can be passed
+	String node = "http://localhost:9500/";
+	String address = "one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy";
+	HistoryParams params = new HistoryParams(address);
+	// For getting only transaction hashes, set `params.setFullTx(false)`
+	System.out.println(getAccountTransactions(node, params));
+}
+```
+
+The output with full transaction history will be: 
+```
+[
+{
+	"blockHash":"0x57db6b6622c2fc6a047d372750c4f0bbf1745847b27848126290a5e0621b9a6c",
+	"blockNumber":"0x18db22",
+	"from":"one18n8e7472pg5fqvcfcr5hg0npquha24wsxmjheg",
+	"gas":"0x33450",
+	"gasPrice":"0x174876e800",
+	"hash":"0x6193734698696eb8e33354a54493e0a760d5e00ef12710bd0847cddd09e85e9a",
+	"input":"0x",
+	"nonce":"0x1f",
+	"r":"0xa00c7c12ae9ca9dbfbea0abc0fe9abc241bcd73caf9849e7194002f354c1088e",
+	"s":"0x588dcfbb8fc354465d2ba6393a09b8ccb555ec647d97de639a106a071f755b77",
+	"shardID":0,
+	"timestamp":"0x5de4ca90",
+	"to":"one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy",
+	"toShardID":0,
+	"transactionIndex":"0x0",
+	"v":"0x26",
+	"value":"0x16345785d8a0000"
+}, ...
+]
+```
+
+The output with only transaction hashes:
+
+```
+[
+"0x6193734698696eb8e33354a54493e0a760d5e00ef12710bd0847cddd09e85e9a",
+"0xd53a22fdac3697d049f1a76c528da42502a1b4be9a37bf6e11ae5ef55d3672cd",
+...
+]
+```
+
 
 ### Balance
 
