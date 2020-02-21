@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import one.harmony.account.HistoryParams;
 import one.harmony.common.ResponseTester;
 import one.harmony.rpc.HmyResponse;
 
@@ -15,5 +16,14 @@ public class BlochchainResponseTest extends ResponseTester {
 		buildResponse(expected);
 		HmyResponse response = deserialiseResponse(HmyResponse.class);
 		assertEquals(response.getResult(), ("0x1"));
+	}
+
+	@Test
+	public void testAccountHistory() throws Exception {
+		String address = "one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy";
+		HistoryParams params = new HistoryParams(address);
+		String expected = "";
+		String actual = Blockchain.getAccountTransactions(params);
+		assertEquals(expected, actual);
 	}
 }
