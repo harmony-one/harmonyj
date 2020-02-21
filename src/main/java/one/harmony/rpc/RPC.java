@@ -56,4 +56,9 @@ public class RPC {
 	public Request<?, HmyResponse> getTransactionReceipt(String txHash) {
 		return new Request<>(RPCMethod.GetTransactionReceipt, Arrays.asList(txHash), service, HmyResponse.class);
 	}
+
+	public Request<?, AccountTransactionsResponse> getTransactionsHistory(Object paramsObj) {
+		return new Request<>(RPCMethod.GetTransactionsHistory, Arrays.asList(paramsObj), service,
+				AccountTransactionsResponse.class);
+	}
 }

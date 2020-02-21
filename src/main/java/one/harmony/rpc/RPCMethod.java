@@ -21,4 +21,5 @@ public final class RPCMethod {
 	static final String SendRawTransaction = "hmy_sendRawTransaction";
 	static final String GetTransactionReceipt = "hmy_getTransactionReceipt";
 	static final String GetShardingStructure = "hmy_getShardingStructure";
+	static final String GetTransactionsHistory = "hmy_getTransactionsHistory";
 }
