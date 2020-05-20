@@ -21,6 +21,7 @@ import one.harmony.transaction.Handler;
  */
 public class Transfer {
 
+	private long nonce = -1;
 	private final String from;
 	private final String to;
 	private final String amount;
@@ -164,6 +165,10 @@ public class Transfer {
 		this.data = data;
 	}
 
+	public void SetNonce(long nonce) {
+		this.nonce = nonce;
+	}
+
 	/**
 	 * Method to prepare the transfer
 	 * 
@@ -195,7 +200,7 @@ public class Transfer {
 	 * @throws Exception
 	 */
 	public String execute(int chainID, boolean dryRun, int waitToConfirmTime) throws Exception {
-		return this.handler.execute(chainID, this.to, this.data, this.amount, this.gasPrice, this.fromShard,
+		return this.handler.execute(chainID, this.nonce, this.to, this.data, this.amount, this.gasPrice, this.fromShard,
 				this.toShard, dryRun, waitToConfirmTime);
 	}
 
