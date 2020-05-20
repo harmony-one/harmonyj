@@ -49,7 +49,7 @@ public class RPC {
 	}
 
 	public Request<?, HmyResponse> getTransactionCount(String hexAddr) {
-		return new Request<>(RPCMethod.GetTransactionCount, Arrays.asList(hexAddr, "latest"), service,
+		return new Request<>(RPCMethod.GetTransactionCount, Arrays.asList(hexAddr, "pending"), service,
 				HmyResponse.class);
 	}
 

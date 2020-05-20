@@ -34,11 +34,13 @@ public class Handler {
 	private TxParams txParams;
 	private Account sender;
 	private String url;
+	private RPC rpc;
 
 	public Handler(Account account, String url) {
 		this.sender = account;
 		this.txParams = new TxParams();
 		this.url = url;
+		this.rpc = new RPC(this.url);
 	}
 
 	private void setShardIDs(int fromShard, int toShard) throws Exception {
@@ -93,7 +95,10 @@ public class Handler {
 	}
 
 	private void verifyBalance(String amount) throws Exception {
-		HmyResponse response = new RPC(this.url).getBalance(this.sender.getAddress().getOneAddr()).send();
+		if (this.rpc == null) {
+			this.rpc = new RPC(this.url);
+		}
+		HmyResponse response = this.rpc.getBalance(this.sender.getAddress().getOneAddr()).send();
 		if (response.hasError()) {
 			throw new Exception(response.getError().getMessage());
 		}
@@ -125,8 +130,10 @@ public class Handler {
 	}
 
 	private void setNextNonce() throws Exception {
-		RPC rpc = new RPC(this.url);
-		HmyResponse response = rpc.getTransactionCount(sender.getAddress().getHexAddr()).send();
+		if (this.rpc == null) {
+			this.rpc = new RPC(this.url);
+		}
+		HmyResponse response = this.rpc.getTransactionCount(sender.getAddress().getHexAddr()).send();
 		if (response.hasError()) {
 			throw new Exception();
 		}
@@ -134,11 +141,16 @@ public class Handler {
 		this.txParams.setNonce(nonce.longValue());
 	}
 
-	private void setNewTransactionWithDataAndGas(String payload, String amount, long gasPrice) {
+	private void setNewTransactionWithDataAndGas(long nonce, String payload, String amount, long gasPrice) {
 		BigInteger amt = new BigDecimal(amount).multiply(DECIMAL_ONE).toBigInteger();
 		BigInteger gas = BigInteger.valueOf(gasPrice).multiply(NANO);
 
-		this.transaction = new Transaction(txParams.getNonce(), txParams.getReceiver(), txParams.getFromShard(),
+		long nextNonce = txParams.getNonce();
+		if (nonce != -1) {
+			nextNonce = nonce;
+		}
+
+		this.transaction = new Transaction(nextNonce, txParams.getReceiver(), txParams.getFromShard(),
 				txParams.getToShard(), amt, txParams.getGas(), gas, payload.getBytes());
 	}
 
@@ -150,7 +162,10 @@ public class Handler {
 	}
 
 	private void sendSignedTx() throws Exception {
-		HmyResponse response = new RPC(this.url).sendRawTransaction(new String(this.transaction.getRawHash())).send();
+		if (this.rpc == null) {
+			this.rpc = new RPC(this.url);
+		}
+		HmyResponse response = this.rpc.sendRawTransaction(new String(this.transaction.getRawHash())).send();
 		if (response.hasError()) {
 			throw new Exception(response.getError().getMessage());
 		}
@@ -158,13 +173,16 @@ public class Handler {
 	}
 
 	private void txConfirm(int waitToConfirmTime) throws Exception {
+		if (this.rpc == null) {
+			this.rpc = new RPC(this.url);
+		}
 		if (waitToConfirmTime > 0) {
 			int start = waitToConfirmTime;
 			for (;;) {
 				if (start < 0) {
 					return;
 				}
-				HmyResponse response = new RPC(this.url).getTransactionReceipt(this.transaction.getTxHash()).send();
+				HmyResponse response = this.rpc.getTransactionReceipt(this.transaction.getTxHash()).send();
 				if (response.hasError()) {
 					throw new Exception(response.getError().getMessage());
 				}
@@ -178,8 +196,8 @@ public class Handler {
 		}
 	}
 
-	public String execute(int chainId, String receiver, String payload, String amount, long gasPrice, int fromShard,
-			int toShard, boolean dryRun, int waitToConfirmTime) throws Exception {
+	public String execute(int chainId, long nonce, String receiver, String payload, String amount, long gasPrice,
+			int fromShard, int toShard, boolean dryRun, int waitToConfirmTime) throws Exception {
 		setShardIDs(fromShard, toShard);
 		setIntrinsicGas(payload);
 		setAmount(amount);
@@ -187,7 +205,7 @@ public class Handler {
 		setReceiver(receiver);
 		setGasPrice();
 		setNextNonce();
-		setNewTransactionWithDataAndGas(payload, amount, gasPrice);
+		setNewTransactionWithDataAndGas(nonce, payload, amount, gasPrice);
 		signAndPrepareTxEncodedForSending(chainId);
 		if (!dryRun) {
 			sendSignedTx();
