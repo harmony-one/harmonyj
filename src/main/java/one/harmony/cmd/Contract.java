@@ -35,7 +35,6 @@ import org.web3j.abi.datatypes.Type;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.RemoteCall;
-import org.web3j.protocol.core.RemoteFunctionCall;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.exceptions.TransactionException;
@@ -252,25 +251,24 @@ public abstract class Contract {
 		return receipt;
 	}
 
-	protected <T extends Type> RemoteFunctionCall<T> executeRemoteCallSingleValueReturn(Function function) {
-		return new RemoteFunctionCall<>(function, () -> executeCallSingleValueReturn(function));
+	protected <T extends Type> RemoteCall<T> executeRemoteCallSingleValueReturn(Function function) {
+		return new RemoteCall<>(() -> executeCallSingleValueReturn(function));
 	}
 
-	protected <T> RemoteFunctionCall<T> executeRemoteCallSingleValueReturn(Function function, Class<T> returnType) {
-		return new RemoteFunctionCall<>(function, () -> executeCallSingleValueReturn(function, returnType));
+	protected <T> RemoteCall<T> executeRemoteCallSingleValueReturn(Function function, Class<T> returnType) {
+		return new RemoteCall<>(() -> executeCallSingleValueReturn(function, returnType));
 	}
 
-	protected RemoteFunctionCall<List<Type>> executeRemoteCallMultipleValueReturn(Function function) {
-		return new RemoteFunctionCall<>(function, () -> executeCallMultipleValueReturn(function));
+	protected RemoteCall<List<Type>> executeRemoteCallMultipleValueReturn(Function function) {
+		return new RemoteCall<>(() -> executeCallMultipleValueReturn(function));
 	}
 
-	protected RemoteFunctionCall<TransactionReceipt> executeRemoteCallTransaction(Function function) {
-		return new RemoteFunctionCall<>(function, () -> executeTransaction(function));
+	protected RemoteCall<TransactionReceipt> executeRemoteCallTransaction(Function function) {
+		return new RemoteCall<>(() -> executeTransaction(function));
 	}
 
-	protected RemoteFunctionCall<TransactionReceipt> executeRemoteCallTransaction(Function function,
-			BigInteger weiValue) {
-		return new RemoteFunctionCall<>(function, () -> executeTransaction(function, weiValue));
+	protected RemoteCall<TransactionReceipt> executeRemoteCallTransaction(Function function, BigInteger weiValue) {
+		return new RemoteCall<>(() -> executeTransaction(function, weiValue));
 	}
 
 	private static <T extends Contract> T create(T contract, String binary, String encodedConstructor, BigInteger value)
