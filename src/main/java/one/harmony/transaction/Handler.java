@@ -1,11 +1,17 @@
 package one.harmony.transaction;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Wallet;
+import org.web3j.crypto.WalletFile;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.Numeric;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,9 +19,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import one.harmony.account.Account;
 import one.harmony.account.Address;
+import one.harmony.keys.Store;
 import one.harmony.rpc.HmyResponse;
 import one.harmony.rpc.RPC;
 import one.harmony.rpc.ShardingStructure.RPCRoutes;
+import one.harmony.rpc.TransactionReceiptResponse;
 import one.harmony.sharding.Sharding;
 
 /**
@@ -29,18 +37,48 @@ public class Handler {
 	private static final BigInteger NANO = BigInteger.TEN.pow(9);
 	private static final BigInteger ONE = NANO.multiply(NANO);
 	private static final BigDecimal DECIMAL_ONE = new BigDecimal(ONE);
+	private static final int DEFAULT_WAIT_TIME = 40;
+	private static final long DEFAULT_NONCE = -1;
+	private static final long DEFAULT_GAS = 21000;
+	private static final String DEFAULT_FROM = "0x0000000000000000000000000000000000000000";
 
 	private Transaction transaction;
 	private TxParams txParams;
 	private Account sender;
+	private String from;
 	private String url;
 	private RPC rpc;
+	private int chainID;
 
 	public Handler(Account account, String url) {
 		this.sender = account;
 		this.txParams = new TxParams();
 		this.url = url;
 		this.rpc = new RPC(this.url);
+	}
+
+	public Handler(String from, String passphrase, String node, int chainID) throws Exception {
+		this.from = from;
+		this.txParams = new TxParams();
+		if (node != null) {
+			this.url = node;
+		} else {
+			List<RPCRoutes> shards = Sharding.getShardingStructure();
+			this.url = Sharding.getHandlerFor(shards, 0);
+		}
+		this.rpc = new RPC(this.url);
+		String accountName = Store.getAccountNameFromAddress(from);
+		boolean isHex = false;
+		Address address = new Address(from, isHex);
+		WalletFile walletFile = Store.extractWalletFileFromAddress(from);
+		Credentials credentials = Credentials.create(Wallet.decrypt(passphrase, walletFile));
+		Account account = new Account(accountName, address, credentials, walletFile);
+		this.sender = account;
+		this.chainID = chainID;
+	}
+
+	public void setChain(int chainID) {
+		this.chainID = chainID;
 	}
 
 	private void setShardIDs(int fromShard, int toShard) throws Exception {
@@ -84,9 +122,9 @@ public class Handler {
 		return gas;
 	}
 
-	private void setIntrinsicGas(String payload) throws Exception {
+	private void setIntrinsicGas(String payload, long provided) throws Exception {
 		byte[] data = payload.getBytes(); // Base64.getDecoder().decode(payload);
-		long gas = computeIntrinsicGas(data, false, true);
+		long gas = Math.max(computeIntrinsicGas(data, false, true), provided);
 		txParams.setGas(gas);
 	}
 
@@ -118,6 +156,10 @@ public class Handler {
 	}
 
 	private void setReceiver(String receiver) {
+		if (receiver == null) { // contract
+			txParams.setReceiver(receiver);
+			return;
+		}
 		if (Address.isOneAddr(receiver)) {
 			txParams.setReceiver(Address.parseBech32(receiver));
 		} else {
@@ -141,7 +183,8 @@ public class Handler {
 		this.txParams.setNonce(nonce.longValue());
 	}
 
-	private void setNewTransactionWithDataAndGas(long nonce, String payload, String amount, long gasPrice) {
+	private void setNewTransactionWithDataAndGas(long nonce, String payload, boolean isHex, String amount,
+			long gasPrice) throws Exception {
 		BigInteger amt = new BigDecimal(amount).multiply(DECIMAL_ONE).toBigInteger();
 		BigInteger gas = BigInteger.valueOf(gasPrice).multiply(NANO);
 
@@ -150,8 +193,14 @@ public class Handler {
 			nextNonce = nonce;
 		}
 
-		this.transaction = new Transaction(nextNonce, txParams.getReceiver(), txParams.getFromShard(),
-				txParams.getToShard(), amt, txParams.getGas(), gas, payload.getBytes());
+		byte[] data;
+		if (isHex) {
+			data = Numeric.hexStringToByteArray(payload);
+		} else {
+			data = payload.getBytes();
+		}
+		this.transaction = new Transaction(getFromAddress(), nextNonce, txParams.getReceiver(), txParams.getFromShard(),
+				txParams.getToShard(), amt, txParams.getGas(), gas, data);
 	}
 
 	private void signAndPrepareTxEncodedForSending(int chainId) throws JsonProcessingException {
@@ -172,7 +221,7 @@ public class Handler {
 		this.transaction.setTxHash(response.getResult());
 	}
 
-	private void txConfirm(int waitToConfirmTime) throws Exception {
+	private TransactionReceipt txConfirm(int waitToConfirmTime) throws Exception {
 		if (this.rpc == null) {
 			this.rpc = new RPC(this.url);
 		}
@@ -180,32 +229,84 @@ public class Handler {
 			int start = waitToConfirmTime;
 			for (;;) {
 				if (start < 0) {
-					return;
+					log.error("could not fetch receipt for transaction with hash: %s", this.transaction.getTxHash());
+					return null;
 				}
-				HmyResponse response = this.rpc.getTransactionReceipt(this.transaction.getTxHash()).send();
+				TransactionReceiptResponse response = this.rpc.getTransactionReceipt(this.transaction.getTxHash())
+						.send();
 				if (response.hasError()) {
 					throw new Exception(response.getError().getMessage());
 				}
-				if (response.getResult() != null) {
-					log.info("received transaction confirmation, ", response.getResult());
-					return;
+				if (response.getReceipt() != null) {
+					log.info(String.format("received transaction confirmation: %s", response.getReceipt()));
+					return response.getReceipt();
 				}
 				Thread.sleep(2000); // 2 seconds sleep
 				start = start - 2;
 			}
 		}
+		return null;
+	}
+
+	private String getFromAddress() throws Exception {
+		if (this.sender != null) {
+			return this.sender.getAddress().getHexAddr();
+		} else if (this.from != null) {
+			return new Address(this.from, false).getHexAddr();
+		} else {
+			return DEFAULT_FROM;
+		}
+	}
+
+	public HmyResponse getCode(String contractAddress, DefaultBlockParameter defaultBlockParameter) throws IOException {
+		return this.rpc.getCode(contractAddress, defaultBlockParameter).send();
+	}
+
+	public String call(String to, String data, DefaultBlockParameter defaultBlockParameter, BigInteger gasLimit)
+			throws Exception {
+		CallArgs args = new CallArgs();
+		args.from = getFromAddress();
+		args.to = to;
+		args.data = data;
+		long gas = Math.max(computeIntrinsicGas(data.getBytes(), false, true), gasLimit.longValue());
+		args.gas = Numeric.encodeQuantity(BigInteger.valueOf(gas));
+		BigInteger gasPrice = BigInteger.valueOf(1).multiply(NANO);
+		args.gasPrice = Numeric.encodeQuantity(gasPrice);
+		args.value = Numeric.encodeQuantity(BigInteger.ZERO);
+
+		HmyResponse response = this.rpc.call(args, defaultBlockParameter).send();
+		if (response.hasError()) {
+			throw new Exception(response.getError().getMessage());
+		}
+		return response.getResult();
+	}
+
+	public TransactionReceipt send(String to, String data, BigInteger value, BigInteger gasPrice, BigInteger gasLimit,
+			boolean constructor) throws Exception {
+		String amount = value.toString();
+		setShardIDs(0, 0);
+		setIntrinsicGas(data, gasLimit.longValue()); //
+		setAmount(amount);
+		verifyBalance(amount);
+		setReceiver(to);
+		setGasPrice();
+		setNextNonce();
+		setNewTransactionWithDataAndGas(DEFAULT_NONCE, data, true, amount, gasPrice.longValue());
+		signAndPrepareTxEncodedForSending(this.chainID);
+		sendSignedTx();
+		return txConfirm(DEFAULT_WAIT_TIME);
 	}
 
 	public String execute(int chainId, long nonce, String receiver, String payload, String amount, long gasPrice,
 			int fromShard, int toShard, boolean dryRun, int waitToConfirmTime) throws Exception {
 		setShardIDs(fromShard, toShard);
-		setIntrinsicGas(payload);
+		setIntrinsicGas(payload, DEFAULT_GAS);
 		setAmount(amount);
 		verifyBalance(amount);
 		setReceiver(receiver);
 		setGasPrice();
 		setNextNonce();
-		setNewTransactionWithDataAndGas(nonce, payload, amount, gasPrice);
+		setNewTransactionWithDataAndGas(nonce, payload, false, amount, gasPrice);
 		signAndPrepareTxEncodedForSending(chainId);
 		if (!dryRun) {
 			sendSignedTx();

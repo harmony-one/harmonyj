@@ -9,13 +9,17 @@ package one.harmony.rpc;
  *
  */
 public final class RPCMethod {
-	/* Blockchain RPCs */
+	/* Blockchain */
 	static final String ProtocolVersion = "hmy_protocolVersion";
 
-	/* Account RPCs */
+	/* Account */
 	static final String GetBalance = "hmy_getBalance";
 
-	/* Transaction RPCs */
+	/* Contract */
+	static final String GetCode = "hmy_getCode";
+	static final String Call = "hmy_call";
+
+	/* Transaction */
 	static final String GetTransactionCount = "hmy_getTransactionCount";
 	static final String SendTransaction = "hmy_sendTransaction";
 	static final String SendRawTransaction = "hmy_sendRawTransaction";
