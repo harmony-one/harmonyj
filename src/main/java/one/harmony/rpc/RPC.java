@@ -3,10 +3,12 @@ package one.harmony.rpc;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.http.HttpService;
 
 import one.harmony.common.Config;
+import one.harmony.transaction.CallArgs;
 
 public class RPC {
 	private final HttpService service;
@@ -53,12 +55,23 @@ public class RPC {
 				HmyResponse.class);
 	}
 
-	public Request<?, HmyResponse> getTransactionReceipt(String txHash) {
-		return new Request<>(RPCMethod.GetTransactionReceipt, Arrays.asList(txHash), service, HmyResponse.class);
+	public Request<?, TransactionReceiptResponse> getTransactionReceipt(String txHash) {
+		return new Request<>(RPCMethod.GetTransactionReceipt, Arrays.asList(txHash), service,
+				TransactionReceiptResponse.class);
 	}
 
 	public Request<?, AccountTransactionsResponse> getTransactionsHistory(Object paramsObj) {
 		return new Request<>(RPCMethod.GetTransactionsHistory, Arrays.asList(paramsObj), service,
 				AccountTransactionsResponse.class);
+	}
+
+	public Request<?, HmyResponse> getCode(String contractAddress, DefaultBlockParameter defaultBlockParameter) {
+		return new Request<>(RPCMethod.GetCode, Arrays.asList(contractAddress, defaultBlockParameter), service,
+				HmyResponse.class);
+	}
+
+	public Request<?, HmyResponse> call(CallArgs transaction, DefaultBlockParameter defaultBlockParameter) {
+		return new Request<>(RPCMethod.Call, Arrays.asList(transaction, defaultBlockParameter), service,
+				HmyResponse.class);
 	}
 }

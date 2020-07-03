@@ -29,6 +29,7 @@ import one.harmony.rpc.RPC;
  *
  */
 public class Transaction {
+	private String from;
 	private BigInteger nonce;
 	private BigInteger gasPrice;
 	private BigInteger gasLimit;
@@ -46,8 +47,9 @@ public class Transaction {
 
 	private String txHash;
 
-	public Transaction(long nonce, String recipient, int shardID, int toShardID, BigInteger amount, long gasLimit,
-			BigInteger gasPrice, byte[] payload) {
+	public Transaction(String from, long nonce, String recipient, int shardID, int toShardID, BigInteger amount,
+			long gasLimit, BigInteger gasPrice, byte[] payload) {
+		this.from = from;
 		this.nonce = BigInteger.valueOf(nonce);
 		this.recipient = recipient;
 		this.shardID = shardID;
@@ -189,7 +191,12 @@ public class Transaction {
 		result.add(RlpString.create(this.getGasLimit()));
 		result.add(RlpString.create(this.getShardID()));
 		result.add(RlpString.create(this.getToShardID()));
-		result.add(RlpString.create(Numeric.hexStringToByteArray(this.getRecipient())));
+		if (this.getRecipient() != null) {
+			// skip contract deploy
+			result.add(RlpString.create(Numeric.hexStringToByteArray(this.getRecipient())));
+		} else {
+			result.add(RlpString.create(""));
+		}
 		result.add(RlpString.create(this.getAmount()));
 		result.add(RlpString.create(this.getPayload()));
 
