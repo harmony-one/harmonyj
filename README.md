@@ -24,7 +24,7 @@ Add the following Maven dependency to your project's `pom.xml`:
 <dependency>
   <groupId>one.harmony</groupId>
   <artifactId>harmonyj</artifactId>
-  <version>1.0.14</version>
+  <version>1.0.19</version>
 </dependency>
 ```
 
@@ -97,8 +97,9 @@ gradle javadoc
 The key API classes can be found under `one.harmony.cmd` are:
 1. [Blockchain](https://github.com/harmony-one/harmonyj/blob/master/src/main/java/one/harmony/cmd/Blockchain.java)
 2. [Balance](https://github.com/harmony-one/harmonyj/blob/master/src/main/java/one/harmony/cmd/Balance.java)
-3. [Keys](https://github.com/harmony-one/harmonyj/blob/master/src/main/java/one/harmony/cmd/Keys.java)
-4. [Transfer](https://github.com/harmony-one/harmonyj/blob/master/src/main/java/one/harmony/cmd/Transfer.java)
+3. [Transfer](https://github.com/harmony-one/harmonyj/blob/master/src/main/java/one/harmony/cmd/Transfer.java)
+4. [Keys](https://github.com/harmony-one/harmonyj/blob/master/src/main/java/one/harmony/cmd/Keys.java)
+5. [Contract](https://github.com/harmony-one/harmonyj/blob/master/src/main/java/one/harmony/cmd/Contract.java)
 
 
 ### Blockchain
@@ -376,3 +377,167 @@ Keys.cleanKeyStore();
 ```
 
 For details about all the APIs, refer to javadocs.
+
+### Contract
+
+Similar to Web3j, Harmonyj provides a codegen feature to generate a java wrapper for your contract, which can be used to deploy and interact with contract. The steps are as follows:
+1. Generate `.abi` and `.bin` file for your contract
+2. Generate `.java` wrapper for your contract
+3. Use `.java` to deploy and interact with your contract
+
+The detailed steps are below:
+
+Generate `.abi` and `.bin` files for your solidity contract. e.g., if you have `Counter.sol`, you could use `solc` or `solcjs`
+
+```sol
+contract Counter {
+    int256 private count = 0;
+
+    function incrementCounter() public {
+        count += 1;
+    }
+
+    function decrementCounter() public {
+        count -= 1;
+    }
+
+    function getCount() public view returns (int256) {
+        return count;
+    }
+}
+```
+
+```
+solcjs Counter.sol --bin --abi --optimize -o <output-dir>
+```
+
+The output directory will contain `Counter_sol_Counter.abi` and `Counter_sol_Counter.bin`.
+
+Generate Harmonyj wrapper, using `SolidityFunctionWrapperGenerator` class. e.g.,
+
+```
+String[] options = new String[] { "-a", "Counter_sol_Counter.abi", "-b", "Counter_sol_Counter.bin", "-o", ".", "-p", "one.harmony.cmd" };
+SolidityFunctionWrapperGenerator.main(options);
+```
+The possible options that can be passed are:
+```
+  -h, --help                 Show this help message and exit.
+  -V, --version              Print version information and exit.
+  -a, --abiFile=<abiFile>    abi file with contract definition.
+  -b, --binFile=<binFile>    bin file with contract compiled code in order to
+                               generate deploy methods.
+  -o, --outputDir=<destinationFileDir>
+                             destination base directory.
+  -p, --package=<packageName>
+                             base package name.
+      -jt, --javaTypes       use native java types.
+                               Default: true
+      -st, --solidityTypes   use solidity types.
+```
+
+The `SolidityFunctionWrapperGenerator` will generate a wrapper `Counter_sol_Counter.java` int the package `one.harmony.cmd`, which can be used to deploy the contract and interact.
+
+#### Deploying the contract
+
+Import/add the account that you wish to use for deploying the contract. e.g.,
+```
+String key = "fd416cb87dcf8ed187e85545d7734a192fc8e976f5b540e9e21e896ec2bc25c3";
+String accountName = "a1";
+Keys.importPrivateKey(key, accountName);
+```
+
+Create a handler with account information such as one-address, passphrase, node url, and chainID. For mainnet: `ChainID.MAINNET`, testnet: `ChainID.TESTNET`, localnet: `ChainID.LOCAL`.
+```
+String from = "one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy";
+String passphrase = "harmony-one";
+String node = "http://127.0.0.1:9500/";
+Handler handler = new Handler(from, passphrase, node, ChainID.LOCAL);
+```
+
+Create a contract gas provider:
+```
+class MyGasProvider extends StaticGasProvider {
+	public MyGasProvider(BigInteger gasPrice, BigInteger gasLimit) {
+		super(gasPrice, gasLimit);
+	}
+}
+MyGasProvider contractGasProvider = new MyGasProvider(new BigInteger("1"), new BigInteger("6721900")); 
+```
+
+Deploy contract:
+```
+Counter_sol_Counter counter = Counter_sol_Counter.deploy(handler, contractGasProvider).send();
+System.out.println("Contract deploy at " + counter.getContractAddress());
+```
+
+Load the deployed contract for interacting:
+```
+MyGasProvider contractGasProvider = new MyGasProvider(new BigInteger("1"), new BigInteger("6721900")); 
+Counter_sol_Counter contract = Counter_sol_Counter.load(contractAddress, contractGasProvider);
+contract.setHandler(handler);
+```
+For read-only contract interactions (such as calling a contract to fetch some value), the handler need not be associated with an account. e.g., 
+```
+String node = "http://127.0.0.1:9500/";
+Handler handler = new Handler(node, ChainID.LOCAL);
+```
+For modifying (or updating) the contract, the handler must be associated with an account, as shown for deploying.
+
+Calling a read-only contract method. e.g., `getCount()` in the Counter contract:
+```
+System.out.println("Value stored in remote smart contract: " + contract.getCount().send());
+```
+
+Updating the contract, e.g., `incrementCounter()` in the Counter contract:
+```
+TransactionReceipt transactionReceipt = contract.incrementCounter().send();
+```
+The `TransactionReceipt` will contain all the details:
+```
+{
+	transactionHash='0x54492458ea1b6200a481d38dc99cb8a19cea16ee777c5ea95bcfafabd7293392', 
+	transactionIndex='0x0', 
+	blockHash='0xe5b6de4343dda1433c3fcffefbc008e17a8a1d17eaa794a8541be10acc67281f', 
+	blockNumber='0xb3a', 
+	cumulativeGasUsed='0xa289', 
+	gasUsed='0xa289', 
+	contractAddress='null', 
+	root='null', 
+	status='0x1', 
+	from='one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy', 
+	to='one19f70ncsqp3ny7wp2h5vmd2540zr6yx2yjs45n7', 
+	logs=[], logsBloom='0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+}
+```
+
+For the complete auto-generated Counter contract: [Auto-generated Counter contract wrapper](https://github.com/harmony-one/harmonyj/blob/master/src/test/java/one/harmony/cmd/Counter_sol_Counter.java)
+
+Complete example of deploying and interacting with Counter contract: [CounterContractExample](https://github.com/harmony-one/harmonyj/blob/master/src/test/java/one/harmony/cmd/CounterContractExample.java)
+
+Decoding the contract logs:
+
+After updating a contract, if we want to process the logs for events, e.g., in the Greeter.sol contract, we want to process the emitted event `Modified`
+```
+function newGreeting(string memory _greeting) public {
+	emit Modified(greeting, _greeting, greeting, _greeting);
+	greeting = _greeting;
+}
+
+event Modified(
+	string indexed oldGreetingIdx, string indexed newGreetingIdx,
+	string oldGreeting, string newGreeting);
+```
+```
+TransactionReceipt transactionReceipt = contract.newGreeting("Well hello again").send();
+for (Greeter_sol_Greeter.ModifiedEventResponse event : contract.getModifiedEvents(transactionReceipt)) {
+	System.out.println(
+			"Modify event fired, previous value: " + event.oldGreeting + ", new value: " + event.newGreeting);
+	System.out.println("Indexed event previous value: " + Numeric.toHexString(event.oldGreetingIdx)
+			+ ", new value: " + Numeric.toHexString(event.newGreetingIdx));
+}
+```
+
+The complete [GreeterContractExample](https://github.com/harmony-one/harmonyj/blob/master/src/test/java/one/harmony/cmd/GreeterContractExample.java)
+
+
+

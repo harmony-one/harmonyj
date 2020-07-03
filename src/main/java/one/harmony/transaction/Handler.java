@@ -77,6 +77,18 @@ public class Handler {
 		this.chainID = chainID;
 	}
 
+	public Handler(String node, int chainID) throws Exception {
+		this.txParams = new TxParams();
+		if (node != null) {
+			this.url = node;
+		} else {
+			List<RPCRoutes> shards = Sharding.getShardingStructure();
+			this.url = Sharding.getHandlerFor(shards, 0);
+		}
+		this.rpc = new RPC(this.url);
+		this.chainID = chainID;
+	}
+
 	public void setChain(int chainID) {
 		this.chainID = chainID;
 	}
