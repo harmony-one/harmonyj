@@ -65,6 +65,23 @@ public class Balance {
 		return covertBalanceToReadableFormat(bln);
 	}
 
+	/**
+	 * Checks account balance using local Harmony instance
+	 * 
+	 * @param oneAddress
+	 * @return
+	 * @throws Exception
+	 */
+	public static String checkLocal(String url, String oneAddress) throws Exception {
+		RPC node = new RPC(url);
+		HmyResponse response = node.getBalance(oneAddress).send();
+		if (response.hasError()) {
+			throw new Exception("failed to fetch the balance for address: " + oneAddress);
+		}
+		BigInteger bln = Numeric.toBigInt(response.getResult());
+		return covertBalanceToReadableFormat(bln);
+	}
+
 	private static String covertBalanceToReadableFormat(BigInteger balance) {
 		BigDecimal decimalBln = new BigDecimal(balance);
 		BigDecimal nano = new BigDecimal(BigInteger.TEN.pow(9));
@@ -76,6 +93,7 @@ public class Balance {
 
 	public static void main(String[] args) throws Exception {
 		String oneAddress = "one1pdv9lrdwl0rg5vglh4xtyrv3wjk3wsqket7zxy"; // One of the harmony accounts in the localnet
-		System.out.println(checkLocal(oneAddress));
+		String url = "http://127.0.0.1:9500";
+		System.out.println(checkLocal(url, oneAddress));
 	}
 }
