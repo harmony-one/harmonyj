@@ -28,9 +28,10 @@ public class TestTransfer {
 		// Execute transfer
 		boolean dryRun = false;
 		int waitToConfirmTime = 0;
+		t.SetGas(50000);
 		String txHash = t.execute(LOCAL_NET, dryRun, waitToConfirmTime); // needs connection to network
 		// Keys.cleanKeyStore();
-		System.out.println();
+		System.out.println(txHash);
 	}
 
 }
