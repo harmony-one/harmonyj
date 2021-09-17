@@ -309,10 +309,10 @@ public class Handler {
 		return txConfirm(DEFAULT_WAIT_TIME);
 	}
 
-	public String execute(int chainId, long nonce, String receiver, String payload, String amount, long gasPrice,
+	public String execute(int chainId, long nonce, String receiver, String payload, String amount, long gas, long gasPrice,
 			int fromShard, int toShard, boolean dryRun, int waitToConfirmTime) throws Exception {
 		setShardIDs(fromShard, toShard);
-		setIntrinsicGas(payload, DEFAULT_GAS);
+		setIntrinsicGas(payload, gas);
 		setAmount(amount);
 		verifyBalance(amount);
 		setReceiver(receiver);

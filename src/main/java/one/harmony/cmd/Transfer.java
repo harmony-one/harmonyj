@@ -25,6 +25,7 @@ public class Transfer {
 	private final String from;
 	private final String to;
 	private final String amount;
+	private long gas = 21000;
 	private final long gasPrice;
 	private final int fromShard;
 	private final int toShard;
@@ -169,6 +170,10 @@ public class Transfer {
 		this.nonce = nonce;
 	}
 
+	public void SetGas(long gas) {
+		this.gas = gas;
+	}
+
 	/**
 	 * Method to prepare the transfer
 	 * 
@@ -200,7 +205,7 @@ public class Transfer {
 	 * @throws Exception
 	 */
 	public String execute(int chainID, boolean dryRun, int waitToConfirmTime) throws Exception {
-		return this.handler.execute(chainID, this.nonce, this.to, this.data, this.amount, this.gasPrice, this.fromShard,
+		return this.handler.execute(chainID, this.nonce, this.to, this.data, this.amount, this.gas, this.gasPrice, this.fromShard,
 				this.toShard, dryRun, waitToConfirmTime);
 	}
 
