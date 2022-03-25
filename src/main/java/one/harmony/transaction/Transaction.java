@@ -256,10 +256,24 @@ public class Transaction {
 			headerByte += recId;
 		}
 
-		// 1 header + 32 bytes for R + 32 bytes for S
+
+
+		
+		int rLen = 32;
+		int sLen = 32;
+		BigInteger base = new BigInteger("256");
+		for(int bytes=31;bytes>0;bytes--) {
+			if(sig.r.divide(base.pow(bytes)).compareTo(BigInteger.ONE)<0){
+				rLen =bytes;
+			}
+			if(sig.s.divide(base.pow(bytes)).compareTo(BigInteger.ONE)<0){
+				sLen = bytes;
+			}
+		}
+
 		byte v = (byte) headerByte;
-		byte[] r = Numeric.toBytesPadded(sig.r, 32);
-		byte[] s = Numeric.toBytesPadded(sig.s, 32);
+		byte[] r = Numeric.toBytesPadded(sig.r, rLen);
+		byte[] s = Numeric.toBytesPadded(sig.s, sLen);
 
 		return new SignatureData(v, r, s);
 	}
