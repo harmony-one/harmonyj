@@ -163,7 +163,7 @@ public class Handler {
 
 		if (transfer.compareTo(balance) > 0) {
 			throw new Exception(
-					String.format("current balance of %lf is not enough for the requested transfer %lf", bln, tns));
+					String.format("current balance of %f is not enough for the requested transfer %f", bln, tns));
 		}
 	}
 
