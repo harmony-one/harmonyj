@@ -223,8 +223,7 @@ public class Transfer {
 		}
 
 		String accountName = Store.getAccountNameFromAddress(this.from);
-		boolean isHex = false;
-		Address address = new Address(this.from, isHex);
+		Address address = new Address(this.from);
 		WalletFile walletFile = Store.extractWalletFileFromAddress(this.from);
 		Credentials credentials = Credentials.create(Wallet.decrypt(passphrase, walletFile));
 		Account account = new Account(accountName, address, credentials, walletFile);

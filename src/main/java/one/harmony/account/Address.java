@@ -26,8 +26,8 @@ public class Address {
 	private final String oneAddr;
 	private final String hexAddr;
 
-	public Address(String addr, boolean isHex) {
-		if (isHex) {
+	public Address(String addr) {
+		if (addr.startsWith("0x")) {
 			this.oneAddr = toBech32(addr);
 			this.hexAddr = addr;
 		} else {
