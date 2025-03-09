@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
+import org.junit.jupiter.api.Test;
 
 import one.harmony.transaction.ChainID;
 import one.harmony.transaction.Handler;
