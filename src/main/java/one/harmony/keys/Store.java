@@ -69,14 +69,15 @@ public class Store {
 		throw new FileNotFoundException();
 	}
 
-	public static File getKeyFileFromAddress(String oneAddress) throws FileNotFoundException {
+	public static File getKeyFileFromAddress(String address) throws FileNotFoundException {
+		Address addr = new Address(address);
 		String keysDirName = getDefaultKeyDirectory();
 		File keysDir = new File(keysDirName);
 
 		for (File file : keysDir.listFiles()) {
 			if (file.isDirectory()) {
 				File keyFile = file.listFiles()[0];
-				if (keyFile.getName().equals(oneAddress + ".json")) {
+				if (keyFile.getName().equals(addr.getOneAddr() + ".json")) {
 					return keyFile;
 				}
 			}
@@ -84,19 +85,20 @@ public class Store {
 		throw new FileNotFoundException();
 	}
 
-	public static String getAccountNameFromAddress(String oneAddress) throws IllegalArgumentException {
+	public static String getAccountNameFromAddress(String address) throws IllegalArgumentException {
+		Address addr = new Address(address);
 		String keysDirName = getDefaultKeyDirectory();
 		File keysDir = new File(keysDirName);
 
 		for (File file : keysDir.listFiles()) {
 			if (file.isDirectory()) {
 				File keyFile = file.listFiles()[0];
-				if (keyFile.getName().equals(oneAddress + ".json")) {
+				if (keyFile.getName().equals(addr.getOneAddr() + ".json")) {
 					return file.getName();
 				}
 			}
 		}
-		throw new IllegalArgumentException("Account does not exists for address: " + oneAddress);
+		throw new IllegalArgumentException("Account does not exists for address: " + addr.getOneAddr());
 	}
 
 	public static Map<String, String> getLocalAccounts() {
@@ -118,12 +120,14 @@ public class Store {
 		return getLocalAccounts().containsKey(name);
 	}
 
-	public static boolean doesAccountExists(String oneAddress) {
-		return getLocalAccounts().values().contains(oneAddress);
+	public static boolean doesAccountExists(String address) {
+		Address addr = new Address(address);
+		return getLocalAccounts().values().contains(addr.getHexAddr());
 	}
 
-	public static String searchForAccount(String oneAddress) throws IllegalArgumentException {
-		return getAccountNameFromAddress(oneAddress);
+	public static String searchForAccount(String address) throws IllegalArgumentException {
+		Address addr = new Address(address);
+		return getAccountNameFromAddress(addr.getHexAddr());
 	}
 
 	public static String getDefaultKeyDirectory() {
@@ -137,12 +141,13 @@ public class Store {
 		return accountDir;
 	}
 
-	public static boolean setAccountName(String oneAddress, String accountName) {
+	public static boolean setAccountName(String address, String accountName) {
+		Address addr = new Address(address);
 		File keysDir = new File(getDefaultKeyDirectory());
 		for (File dir : keysDir.listFiles()) {
 			if (dir.isDirectory()) {
 				File addressFile = dir.listFiles()[0];
-				if (addressFile.getName().equals(oneAddress)) {
+				if (addressFile.getName().equals(addr.getOneAddr())) {
 					File newDir = new File(String.format("%s%s%s", dir.getParent(), File.separator, accountName));
 					dir.renameTo(newDir);
 				}
@@ -191,9 +196,10 @@ public class Store {
 		return objectMapper.readValue(keyFile, WalletFile.class);
 	}
 
-	public static WalletFile extractWalletFileFromAddress(String oneAddress)
+	public static WalletFile extractWalletFileFromAddress(String address)
 			throws JsonParseException, JsonMappingException, IOException {
-		File keyFile = getKeyFileFromAddress(oneAddress);
+		Address addr = new Address(address);
+		File keyFile = getKeyFileFromAddress(addr.getOneAddr());
 		return objectMapper.readValue(keyFile, WalletFile.class);
 	}
 
@@ -216,8 +222,9 @@ public class Store {
 		return usingBufferedReader(keyFile);
 	}
 
-	public static String extractKeyStoreFileFromAddress(String oneAddress) throws FileNotFoundException {
-		File keyFile = getKeyFileFromAddress(oneAddress);
+	public static String extractKeyStoreFileFromAddress(String address) throws FileNotFoundException {
+		Address addr = new Address(address);
+		File keyFile = getKeyFileFromAddress(addr.getOneAddr());
 		return usingBufferedReader(keyFile);
 	}
 

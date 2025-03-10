@@ -64,19 +64,34 @@ public abstract class Contract {
 	protected Contract(String contractBinary, String contractAddress, Handler handler,
 			ContractGasProvider gasProvider) {
 		this.handler = handler;
-		this.contractAddress = contractAddress;
+		if (contractAddress == null) {
+			this.contractAddress = null;
+		} else {
+			one.harmony.account.Address addr = new one.harmony.account.Address(contractAddress);
+			this.contractAddress = addr.getHexAddr();
+		}
 		this.contractBinary = contractBinary;
 		this.gasProvider = gasProvider;
 	}
 
 	protected Contract(String contractBinary, String contractAddress, ContractGasProvider gasProvider) {
-		this.contractAddress = contractAddress;
+		if (contractAddress == null) {
+			this.contractAddress = null;
+		} else {
+			one.harmony.account.Address addr = new one.harmony.account.Address(contractAddress);
+			this.contractAddress = addr.getHexAddr();
+		}
 		this.contractBinary = contractBinary;
 		this.gasProvider = gasProvider;
 	}
 
 	protected Contract(String contractBinary, String contractAddress, BigInteger gasPrice, BigInteger gasLimit) {
-		this.contractAddress = contractAddress;
+		if (contractAddress == null) {
+			this.contractAddress = null;
+		} else {
+			one.harmony.account.Address addr = new one.harmony.account.Address(contractAddress);
+			this.contractAddress = addr.getHexAddr();
+		}
 		this.contractBinary = contractBinary;
 		this.gasProvider = new StaticGasProvider(gasPrice, gasLimit);
 	}
@@ -86,7 +101,12 @@ public abstract class Contract {
 	}
 
 	public void setContractAddress(String contractAddress) {
-		this.contractAddress = contractAddress;
+		if (contractAddress == null) {
+			this.contractAddress = null;
+		} else {
+			one.harmony.account.Address addr = new one.harmony.account.Address(contractAddress);
+			this.contractAddress = addr.getHexAddr();
+		}
 	}
 
 	public String getContractAddress() {
