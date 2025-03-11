@@ -31,3 +31,8 @@ gradle test
 
 All tests should succeed under this setup
 
+## Tips on using Harmony Docker image for running nodes
+
+Please make sure you turned on "EXPOSEAPIS" flag in the script (`deploy.sh`) for running local net, otherwise the node might not be accessible from host machine, since in some operating systems (such as macOS) the node binds to 127.0.0.1 (inaccessible to host) instead of 0.0.0.0 (accessible to all networks including the host)
+
+The flag is located at: https://github.com/harmony-one/harmony/blob/afe93578992bd9c3f63dd103768841ab709377cb/test/deploy.sh#L184
