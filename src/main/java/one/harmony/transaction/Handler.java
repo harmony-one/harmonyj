@@ -68,8 +68,7 @@ public class Handler {
 		}
 		this.rpc = new RPC(this.url);
 		String accountName = Store.getAccountNameFromAddress(from);
-		boolean isHex = false;
-		Address address = new Address(from, isHex);
+		Address address = new Address(from);
 		WalletFile walletFile = Store.extractWalletFileFromAddress(from);
 		Credentials credentials = Credentials.create(Wallet.decrypt(passphrase, walletFile));
 		Account account = new Account(accountName, address, credentials, walletFile);
@@ -163,7 +162,7 @@ public class Handler {
 
 		if (transfer.compareTo(balance) > 0) {
 			throw new Exception(
-					String.format("current balance of %lf is not enough for the requested transfer %lf", bln, tns));
+					String.format("current balance of %f is not enough for the requested transfer %f", bln, tns));
 		}
 	}
 
@@ -264,7 +263,7 @@ public class Handler {
 		if (this.sender != null) {
 			return this.sender.getAddress().getHexAddr();
 		} else if (this.from != null) {
-			return new Address(this.from, false).getHexAddr();
+			return new Address(this.from).getHexAddr();
 		} else {
 			return DEFAULT_FROM;
 		}

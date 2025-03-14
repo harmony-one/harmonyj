@@ -39,7 +39,8 @@ public class HistoryParams {
 	 * @param address
 	 */
 	public HistoryParams(String address) {
-		this.address = address;
+		Address addr = new Address(address);
+		this.address = addr.getOneAddr();
 	}
 
 	public String getAddress() {
@@ -47,7 +48,8 @@ public class HistoryParams {
 	}
 
 	public void setAddress(String address) {
-		this.address = address;
+		Address addr = new Address(address);
+		this.address = addr.getOneAddr();
 	}
 
 	public int getPageIndex() {
